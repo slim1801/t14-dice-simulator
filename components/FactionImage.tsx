@@ -3,8 +3,9 @@ import styled from "styled-components";
 import Image from "next/image";
 import { FACTION_NAMES } from "../constants/factions";
 import { Factions } from "../types";
+import { FactionBackgroundImage } from "./FactionBackgroundImage";
 
-const ImageContainer = styled.div`
+const ImageContainer = styled(FactionBackgroundImage)`
   border: 3px solid white;
   border-radius: 5px;
   padding: 10px;
@@ -14,6 +15,8 @@ const ImageContainer = styled.div`
   flex-flow: column;
   height: 180px;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 `;
 
 const Label = styled.b`
@@ -26,7 +29,7 @@ interface FactionImageProps {
 
 const FactionImage: FunctionComponent<FactionImageProps> = ({ faction }) => {
   return (
-    <ImageContainer>
+    <ImageContainer faction={faction}>
       <Image
         alt={faction}
         src={`/images/symbols/${faction}.png`}

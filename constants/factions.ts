@@ -192,9 +192,13 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combatMod: [1],
       },
     },
+    War_Sun: {
+      spaceCombat: {
+        combatMod: [1],
+      },
+    },
     Dreadnought: {
       spaceCombat: {
-        combat: 5,
         combatMod: [1],
       },
       bombardment: {

@@ -98,6 +98,7 @@ const CombatButton = styled(StylelessButton)`
   color: white;
   margin-top: 5px;
   background-color: grey;
+  font-size: 14px;
 `;
 
 const IconContainer = styled.div`
@@ -442,9 +443,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     }
     return "";
   }, [rolling]);
-
-  console.log(rolls);
-  console.log(rollHits);
 
   const onReroll = useCallback(async () => {
     const newRolls: Partial<UnitRolls> = {};

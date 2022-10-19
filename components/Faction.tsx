@@ -11,29 +11,31 @@ import UnitRow from "./UnitRow";
 import UnitIcon from "./UnitIcon";
 import CombatModal from "./CombatModal";
 import { StylelessButton } from "./StylelessButton";
-import TechnologyButton from "./TechnologyButton";
 import {
   DEFAULT_UNIT_COMBAT_STRENGTH,
   DEFAULT_UNIT_UPGRADE_COMBAT,
 } from "../constants/units";
-import {
-  NumUnits,
-  UnitUpgraded,
-  Factions,
-  Units,
-  UnitCombat,
-  CombatTechnology,
-} from "../types";
+import { NumUnits, UnitUpgraded, Factions, Units, UnitCombat } from "../types";
+import { FactionBackgroundImage } from "./FactionBackgroundImage";
 
 interface FactionProps {
   faction: Factions;
 }
 
-const Container = styled.div`
+const Container = styled(FactionBackgroundImage)`
   display: flex;
   flex-flow: column;
   height: 100vh;
+  position: relative;
+
+  &:before {
+    filter: blur(4px);
+  }
 `;
+
+interface BackgroundImageProps {
+  faction: Factions;
+}
 
 const ScrollContainer = styled.div`
   padding: 20px;
@@ -164,7 +166,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
 
   return (
     <>
-      <Container>
+      <Container faction={faction}>
         <FactionLabel>
           <Image
             alt={faction}
