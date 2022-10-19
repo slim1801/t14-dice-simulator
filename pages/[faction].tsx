@@ -1,6 +1,7 @@
 import Faction from "../components/Faction";
 import { Layout } from "../components/Layout";
-import { ALL_FACTIONS, Factions } from "../constants/factions";
+import { ALL_FACTIONS } from "../constants/factions";
+import { Factions } from "../types";
 
 interface FactionPageProps {
   faction: Factions;
