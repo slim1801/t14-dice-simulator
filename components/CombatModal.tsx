@@ -581,7 +581,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
             return (
               <CombatUnitRow key={unit}>
                 <IconContainer>
-                  <IconImage unit={unit} />
+                  <IconImage faction={faction} unit={unit} />
                   <NumUnitsContainer>x{_numUnits[unit]}</NumUnitsContainer>
                 </IconContainer>
                 <Combat

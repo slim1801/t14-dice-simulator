@@ -33,10 +33,6 @@ const Container = styled(FactionBackgroundImage)`
   }
 `;
 
-interface BackgroundImageProps {
-  faction: Factions;
-}
-
 const ScrollContainer = styled.div`
   padding: 20px;
   overflow: auto;
@@ -190,6 +186,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Flagship"
+              faction={faction}
               hideUpgrade={!(Object.keys(factionUpgrade.Flagship).length > 0)}
               width={60}
               upgraded={upgraded.Flagship}
@@ -206,6 +203,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="War_Sun"
               width={50}
+              faction={faction}
               upgraded={upgraded.War_Sun}
               hideUpgrade={!(Object.keys(factionUpgrade.War_Sun).length > 0)}
               onUpgraded={_setUpgraded("War_Sun")}
@@ -221,6 +219,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Dreadnought"
               width={65}
+              faction={faction}
               upgraded={upgraded.Dreadnought}
               hideUpgrade={
                 !(Object.keys(factionUpgrade.Dreadnought).length > 0)
@@ -238,6 +237,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Cruiser"
               width={60}
+              faction={faction}
               upgraded={upgraded.Cruiser}
               hideUpgrade={!(Object.keys(factionUpgrade.Cruiser).length > 0)}
               onUpgraded={_setUpgraded("Cruiser")}
@@ -253,6 +253,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Destroyer"
               width={40}
+              faction={faction}
               upgraded={upgraded.Destroyer}
               hideUpgrade={!(Object.keys(factionUpgrade.Destroyer).length > 0)}
               onUpgraded={_setUpgraded("Destroyer")}
@@ -268,6 +269,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Carrier"
               width={50}
+              faction={faction}
               upgraded={upgraded.Carrier}
               hideUpgrade={!(Object.keys(factionUpgrade.Carrier).length > 0)}
               onUpgraded={_setUpgraded("Carrier")}
@@ -282,6 +284,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Fighter"
               width={30}
+              faction={faction}
               upgraded={upgraded.Fighter}
               hideUpgrade={!(Object.keys(factionUpgrade.Fighter).length > 0)}
               onUpgraded={_setUpgraded("Fighter")}
@@ -295,6 +298,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             setNumUnits={_setNumUnits("PDS")}
           >
             <UnitIcon
+              faction={faction}
               unit="PDS"
               width={30}
               upgraded={upgraded.PDS}
@@ -312,6 +316,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Mech"
               width={30}
+              faction={faction}
               upgraded={upgraded.Mech}
               hideUpgrade={!(Object.keys(factionUpgrade.Mech).length > 0)}
               onUpgraded={_setUpgraded("Mech")}
@@ -326,6 +331,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
             <UnitIcon
               unit="Infantry"
               width={30}
+              faction={faction}
               upgraded={upgraded.Infantry}
               hideUpgrade={!(Object.keys(factionUpgrade.Infantry).length > 0)}
               onUpgraded={_setUpgraded("Infantry")}

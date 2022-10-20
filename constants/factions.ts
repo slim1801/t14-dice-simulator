@@ -58,6 +58,50 @@ export const FACTION_NAMES: FactionType = {
   Cabal: "The Vuil'Raith Cabal",
 };
 
+export const FACTION_COLORS: FactionType = {
+  Arborec:
+    "grayscale(100%) sepia(52%) saturate(341%) hue-rotate(42deg) brightness(90%);",
+  Barony:
+    "grayscale(100%) sepia(40%) saturate(600%) hue-rotate(-50deg) contrast(200%);",
+  Saar: "grayscale(100%) sepia(58%) saturate(492%) hue-rotate(350deg);",
+  Muaat: "grayscale(100%) sepia(68%) saturate(646%) hue-rotate(338deg);",
+  Hacan: "grayscale(100%) sepia(98%) saturate(562%) hue-rotate(340deg);",
+  Sol: "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(161deg);",
+  Ghosts: "grayscale(100%) sepia(19%) saturate(718%) hue-rotate(159deg)",
+  L1Z1X:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-50deg) brightness(0.6) contrast(2)",
+  Mentak:
+    "grayscale(100%) sepia(97%) saturate(864%) hue-rotate(9deg) brightness(114%) contrast(103%);",
+  Naalu:
+    "grayscale(100%) sepia(69%) saturate(759%) hue-rotate(16deg) brightness(102%) contrast(92%);",
+  Nekro:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-50deg) brightness(0.7) contrast(2)",
+  Sardakk:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-53deg) brightness(0.8) contrast(1.5)",
+  "Jol-Nar":
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-160deg) brightness(0.7) ",
+  Winnu:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.6)",
+  Xxcha:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-245deg) brightness(0.8) contrast(1.5)",
+  Yin: "grayscale(100%) sepia(30%) saturate(600%) hue-rotate(-160deg) brightness(0.7) contrast(0.9)",
+  Yssaril:
+    "grayscale(100%) sepia(70%) saturate(500%) hue-rotate(60deg) brightness(0.8)",
+  Argent:
+    "grayscale(100%) sepia(100%) saturate(1738%) hue-rotate(323deg) brightness(99%) contrast(100%);",
+  Empyrean:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.7) contrast(1.5)",
+  Mahact: "grayscale(100%) sepia(100%) saturate(500%)",
+  NaazRokha:
+    "grayscale(100%) sepia(30%) saturate(1500%) hue-rotate(45deg) brightness(0.6) ",
+  Nomad:
+    "grayscale(100%) sepia(100%) saturate(300%) hue-rotate(175deg) brightness(0.7);",
+  Titans:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-75deg) brightness(0.65) contrast(1.7)",
+  Cabal:
+    "grayscale(100%) sepia(60%) saturate(400%) hue-rotate(-50deg) brightness(0.65) contrast(2)",
+};
+
 export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   Arborec: {
     Flagship: {

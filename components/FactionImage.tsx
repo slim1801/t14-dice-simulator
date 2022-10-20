@@ -33,8 +33,8 @@ const FactionImage: FunctionComponent<FactionImageProps> = ({ faction }) => {
       <Image
         alt={faction}
         src={`/images/symbols/${faction}.png`}
-        width={75}
-        height={75}
+        width={60}
+        height={60}
       />
       <Label>{FACTION_NAMES[faction]}</Label>
     </ImageContainer>

@@ -1,10 +1,11 @@
 import Image from "next/image";
 import styled, { css } from "styled-components";
-import { Units } from "../types";
+import { Factions, Units } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
 
 interface UnitIconProps {
+  faction: Factions;
   unit: Units;
   upgraded?: boolean;
   hideUpgrade?: boolean;
@@ -58,6 +59,7 @@ const UpgradeButton = styled(StylelessButton)<UpgradeButtonProps>`
 `;
 
 const UnitIcon: React.FunctionComponent<UnitIconProps> = ({
+  faction,
   unit,
   upgraded,
   hideUpgrade,
@@ -67,7 +69,7 @@ const UnitIcon: React.FunctionComponent<UnitIconProps> = ({
   return (
     <IconContainer>
       <IconWrapper width={width}>
-        <IconImage unit={unit} />
+        <IconImage faction={faction} unit={unit} />
       </IconWrapper>
       {!hideUpgrade && (
         <UpgradeButton
