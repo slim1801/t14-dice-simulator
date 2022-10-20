@@ -74,7 +74,10 @@ export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
 
-export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring";
+export type CombatTechnology =
+  | "Antimass Deflectors"
+  | "Plasma Scoring"
+  | "Supercharge";
 export type CombatActionCards =
   | "Bunker"
   | "Fighter Prototype"
@@ -94,3 +97,9 @@ interface Technology {
 }
 
 export type FactionTechnologies = Record<Factions, Technology[]>;
+
+export type CombatLeaderAbilities =
+  | "Viscount Unlenn"
+  | "Rickar Rickani"
+  | "Trrakan Aun Zulok";
+export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;

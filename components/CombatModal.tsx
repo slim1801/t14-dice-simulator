@@ -11,6 +11,7 @@ import {
   UnitRolls,
   Units,
   CombatActionCards,
+  CombatLeaderAbilities,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -19,7 +20,11 @@ import RoundButton from "./RoundButton";
 import TechnologyButton from "./TechnologyButton";
 import { FACTION_TECHNOLOGY, TECHNOLOGY_COMBAT } from "../constants/technology";
 import { ACTION_COMBAT, COMBAT_ACTION_CARDS } from "../constants/actions";
-import ActionButton from "./ActionButton";
+import {
+  FACTION_LEADER_ABILITIES,
+  LEADER_ABILITIES_COMBAT,
+} from "../constants/leaders";
+import SelectableButton from "./SelectableButton";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -223,9 +228,10 @@ const _doroll = (num: number): number[] => {
 };
 
 const doRolls = (numUnits: number, rolls?: number, rollMod?: number[]) => {
-  const numRolls =
-    (rolls || 1) + (rollMod || [0]).reduce((acc, val) => acc + val, 0);
-  return _doroll(numUnits * (numRolls || 1));
+  return _doroll(
+    numUnits * (rolls || 1) +
+      (rollMod || [0]).reduce((acc, val) => acc + val, 0)
+  );
 };
 
 const ROLLING_TIMEOUT = 150;
@@ -277,6 +283,37 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     }));
   }, []);
 
+  const defaultSelectedAbilitiesLeaders = useMemo(() => {
+    return FACTION_LEADER_ABILITIES[faction].reduce((acc, leaderAbility) => {
+      acc[leaderAbility] = false;
+      return acc;
+    }, {} as Record<CombatLeaderAbilities, boolean>);
+  }, [faction]);
+
+  const [selectedLeaderAbilities, setSelectedAbilitiesLeaders] = useState(
+    defaultSelectedAbilitiesLeaders
+  );
+
+  const onAbilitiesLeadersSelected = useCallback(
+    (leadersAbility: CombatLeaderAbilities) => {
+      setSelectedAbilitiesLeaders((prevState) => ({
+        ...prevState,
+        [leadersAbility]: !prevState[leadersAbility],
+      }));
+    },
+    []
+  );
+
+  const activeUnits = useMemo(() => {
+    return UnitOrder.filter((unit) => numUnits[unit] > 0);
+  }, [numUnits]);
+
+  const [rolls, setRolls] = useState<Partial<UnitRolls>>({});
+
+  const [combatType, setCombatType] = useState<CombatType | null>(null);
+
+  const [rolling, setRolling] = useState(0);
+
   const unitCombat = useMemo(() => {
     let _unitCombat: UnitCombat = JSON.parse(JSON.stringify(initialUnitCombat));
 
@@ -312,18 +349,31 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       }
     });
 
+    // Calculate leader abilities
+    const leaderAbilitiesKeys = Object.keys(
+      selectedLeaderAbilities
+    ) as CombatLeaderAbilities[];
+
+    leaderAbilitiesKeys.forEach((leaderAbilitiesKey) => {
+      if (selectedLeaderAbilities[leaderAbilitiesKey]) {
+        const modCombat = LEADER_ABILITIES_COMBAT[leaderAbilitiesKey](
+          initialUnitCombat,
+          numUnits
+        );
+        if (modCombat) {
+          _unitCombat = deepmerge(_unitCombat, modCombat);
+        }
+      }
+    });
+
     return _unitCombat;
-  }, [initialUnitCombat, selectedTechnologies, selectedActionCards, numUnits]);
-
-  const activeUnits = useMemo(() => {
-    return UnitOrder.filter((unit) => numUnits[unit] > 0);
-  }, [numUnits]);
-
-  const [rolls, setRolls] = useState<Partial<UnitRolls>>({});
-
-  const [combatType, setCombatType] = useState<CombatType | null>(null);
-
-  const [rolling, setRolling] = useState(0);
+  }, [
+    initialUnitCombat,
+    selectedTechnologies,
+    selectedActionCards,
+    selectedLeaderAbilities,
+    numUnits,
+  ]);
 
   const rollingTimeout = useCallback(async () => {
     setRolling(1);
@@ -336,12 +386,12 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   }, []);
 
   const onCombat = useCallback(
-    (combatType: CombatType) => {
+    (_combatType: CombatType) => {
       return async () => {
         if (rolling > 0) {
           return;
         }
-        setCombatType(combatType);
+        setCombatType(_combatType);
 
         setRolls({});
         await rollingTimeout();
@@ -349,12 +399,12 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         const activeRolls: Partial<UnitRolls> = {};
 
         const activeUnits: Units[] = UnitOrder.filter(
-          (unit) => unitCombat[unit][combatType]?.combat !== undefined
+          (unit) => unitCombat[unit][_combatType]?.combat !== undefined
         );
 
         activeUnits.forEach((unit) => {
           if (_numUnits[unit] > 0) {
-            const combatDetails = unitCombat[unit][combatType];
+            const combatDetails = unitCombat[unit][_combatType];
             activeRolls[unit] = [
               {
                 combat: combatDetails?.combat,
@@ -498,16 +548,34 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
           <Actions>
             {COMBAT_ACTION_CARDS.map((actionCard) => (
               <HeaderButtonContainer key={actionCard}>
-                <ActionButton
+                <SelectableButton
+                  highlightColor="orange"
                   selected={selectedActionCards[actionCard]}
                   onClick={() => onActionCardSelected(actionCard)}
                 >
                   {actionCard}
-                </ActionButton>
+                </SelectableButton>
               </HeaderButtonContainer>
             ))}
           </Actions>
         </Header>
+        {FACTION_LEADER_ABILITIES[faction] && (
+          <Header>
+            <Technologies>
+              {FACTION_LEADER_ABILITIES[faction].map((leaderAbility) => (
+                <HeaderButtonContainer key={leaderAbility}>
+                  <SelectableButton
+                    highlightColor="purple"
+                    selected={selectedLeaderAbilities[leaderAbility]}
+                    onClick={() => onAbilitiesLeadersSelected(leaderAbility)}
+                  >
+                    {leaderAbility}
+                  </SelectableButton>
+                </HeaderButtonContainer>
+              ))}
+            </Technologies>
+          </Header>
+        )}
         <Content>
           {activeUnits.map((unit) => {
             return (

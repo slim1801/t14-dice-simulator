@@ -4,11 +4,13 @@ import { TechnologyType } from "../types";
 
 interface ActionCardButtonProps {
   selected: boolean;
+  highlightColor: string;
   onClick: () => void;
 }
 
 interface ActionButtonComponentProps {
   selected: boolean;
+  highlightColor: string;
 }
 
 const ActionCardButtonComponent = styled.button<ActionButtonComponentProps>`
@@ -25,19 +27,23 @@ const ActionCardButtonComponent = styled.button<ActionButtonComponentProps>`
   ${(props) =>
     props.selected &&
     css`
-      background-color: orange;
+      background-color: ${props.highlightColor};
       color: white;
     `}
 `;
 
-const ActionButton: React.FunctionComponent<
+const SelectableButton: React.FunctionComponent<
   PropsWithChildren<ActionCardButtonProps>
-> = ({ children, selected, onClick }) => {
+> = ({ children, highlightColor, selected, onClick }) => {
   return (
-    <ActionCardButtonComponent selected={selected} onClick={() => onClick?.()}>
+    <ActionCardButtonComponent
+      highlightColor={highlightColor}
+      selected={selected}
+      onClick={() => onClick?.()}
+    >
       {children}
     </ActionCardButtonComponent>
   );
 };
 
-export default ActionButton;
+export default SelectableButton;

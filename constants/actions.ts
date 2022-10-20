@@ -1,10 +1,4 @@
-import {
-  CombatActionCards,
-  CombatEvalFunc,
-  NumUnits,
-  UnitCombat,
-  Units,
-} from "../types";
+import { CombatActionCards, CombatEvalFunc, UnitCombat, Units } from "../types";
 
 export const COMBAT_ACTION_CARDS: CombatActionCards[] = [
   "Bunker",

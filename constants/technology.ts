@@ -6,6 +6,7 @@ import {
   UnitCombat,
   Units,
 } from "../types";
+import { combatModFunc, optimisedRoll } from "../utils/combat";
 import { ALL_FACTIONS } from "./factions";
 
 export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
@@ -14,6 +15,9 @@ export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
       { name: "Antimass Deflectors", type: "Propulsion" },
       { name: "Plasma Scoring", type: "Warfare" },
     ];
+    if (faction === "NaazRokha") {
+      acc[faction].push({ name: "Supercharge", type: "Warfare" });
+    }
     return acc;
   },
   {} as FactionTechnologies
@@ -37,36 +41,6 @@ export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
     }
     return moddedCombat;
   },
-  "Plasma Scoring": (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
-    let bestCombat: Partial<UnitCombat> | null = null;
-    if (unitCombat) {
-      const units = Object.keys(unitCombat) as Units[];
-      for (let i = 0; i < units.length; i++) {
-        const unitKey = units[i];
-        const _unitCombat = unitCombat[unitKey];
-        if (
-          _unitCombat.bombardment?.combat &&
-          numUnits &&
-          numUnits?.[unitKey] > 0
-        ) {
-          if (
-            !bestCombat ||
-            (bestCombat[unitKey]?.bombardment?.combat &&
-              (bestCombat[unitKey]?.bombardment?.combat || 0) >
-                _unitCombat.bombardment.combat)
-          ) {
-            bestCombat = {
-              [unitKey]: {
-                bombardment: {
-                  ..._unitCombat.bombardment,
-                  rollMod: [1],
-                },
-              },
-            };
-          }
-        }
-      }
-    }
-    return bestCombat;
-  },
+  "Plasma Scoring": optimisedRoll(["bombardment"], [1]),
+  Supercharge: combatModFunc([1]),
 };

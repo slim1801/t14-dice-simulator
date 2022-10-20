@@ -16,7 +16,7 @@ export const FactionBackgroundImage = styled.div<FactionBackgroundImageProps>`
     top: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.2;
+    opacity: 0.3;
     z-index: -1;
     background-image: url(${(props) =>
       `/images/factions/${props.faction}.webp`});
