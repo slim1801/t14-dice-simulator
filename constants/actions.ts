@@ -1,4 +1,5 @@
 import { CombatActionCards, CombatEvalFunc, UnitCombat, Units } from "../types";
+import { combatModFunc } from "../utils/combat";
 
 export const COMBAT_ACTION_CARDS: CombatActionCards[] = [
   "Bunker",
@@ -36,26 +37,7 @@ export const ACTION_COMBAT: Record<CombatActionCards, CombatEvalFunc> = {
     };
     return moddedCombat;
   },
-  "Morale Boost": (unitCombat?: UnitCombat) => {
-    const moddedCombat: Partial<UnitCombat> | null = {};
-    if (unitCombat) {
-      const units = Object.keys(unitCombat) as Units[];
-      units.reduce((acc, unit) => {
-        if (unitCombat[unit].spaceCombat?.combat) {
-          acc[unit] = {
-            ...(unitCombat[unit].spaceCombat?.combat && {
-              spaceCombat: { combatMod: [1] },
-            }),
-            ...(unitCombat[unit].groundCombat?.combat && {
-              groundCombat: { combatMod: [1] },
-            }),
-          };
-        }
-        return acc;
-      }, moddedCombat);
-    }
-    return moddedCombat;
-  },
+  "Morale Boost": combatModFunc([1]),
   Blitz: (unitCombat?: UnitCombat) => {
     const moddedCombat: Partial<UnitCombat> | null = {};
     if (unitCombat) {

@@ -2,7 +2,6 @@ import {
   CombatEvalFunc,
   CombatTechnology,
   FactionTechnologies,
-  NumUnits,
   UnitCombat,
   Units,
 } from "../types";

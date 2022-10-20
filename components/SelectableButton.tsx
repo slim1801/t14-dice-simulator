@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
 import styled, { css } from "styled-components";
-import { TechnologyType } from "../types";
 
 interface ActionCardButtonProps {
   selected: boolean;
