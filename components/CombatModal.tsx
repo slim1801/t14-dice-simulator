@@ -12,6 +12,7 @@ import {
   Units,
   CombatActionCards,
   CombatLeaderAbilities,
+  CombatAgendaCards,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -25,6 +26,7 @@ import {
   LEADER_ABILITIES_COMBAT,
 } from "../constants/leaders";
 import SelectableButton from "./SelectableButton";
+import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -46,6 +48,7 @@ const ModalContent = styled.div`
 
 const Content = styled.div`
   flex: 1;
+  margin-top: 10px;
   overflow: auto;
 `;
 
@@ -80,7 +83,8 @@ const Rolling = styled.div`
 
 const CloseButton = styled(StylelessButton)`
   display: flex;
-  padding: 10px;
+  padding-top: 10px;
+  padding-right: 10px;
   font-size: 20px;
 `;
 
@@ -116,7 +120,7 @@ const NumUnitsContainer = styled.div`
   position: absolute;
   bottom: -5px;
   right: 0;
-  font-size: 10px;
+  font-size: 11px;
 `;
 
 const CombatUnitRow = styled.div`
@@ -151,7 +155,6 @@ const TotalHitsContainer = styled.div`
 `;
 
 const TotalLabel = styled.span`
-  flex: 1;
   text-align: right;
   padding-right: 12px;
   font-weight: 500;
@@ -181,19 +184,14 @@ const RoundButtonContainer = styled.div`
   align-items: center;
 `;
 
-const Technologies = styled.div`
-  padding-left: 5px;
-  flex: 1;
-  display: flex;
-`;
-const Actions = styled.div`
+const HeaderWrapper = styled.div`
   padding-left: 5px;
   flex: 1;
   display: flex;
 `;
 
 const HeaderButtonContainer = styled.div`
-  margin-bottom: 10px;
+  margin-top: 10px;
   margin-right: 10px;
 `;
 
@@ -303,6 +301,17 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     },
     []
   );
+
+  const [selectedAgendas, setSelectedAgendas] = useState({
+    "Prophecy of Ixth": false,
+  });
+
+  const onAgendaSelected = useCallback((agenda: CombatAgendaCards) => {
+    setSelectedAgendas((prevState) => ({
+      ...prevState,
+      [agenda]: !prevState[agenda],
+    }));
+  }, []);
 
   const activeUnits = useMemo(() => {
     return UnitOrder.filter((unit) => numUnits[unit] > 0);
@@ -526,11 +535,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     <Overlay>
       <ModalContent>
         <Header>
-          {rolling > 0 && <Rolling>{rollingLabel}</Rolling>}
-          <CloseButton onClick={onClose}>X</CloseButton>
-        </Header>
-        <Header>
-          <Technologies>
+          <HeaderWrapper>
             {FACTION_TECHNOLOGY[faction].map((tech) => (
               <HeaderButtonContainer key={tech.name}>
                 <TechnologyButton
@@ -542,10 +547,11 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </TechnologyButton>
               </HeaderButtonContainer>
             ))}
-          </Technologies>
+          </HeaderWrapper>
+          <CloseButton onClick={onClose}>X</CloseButton>
         </Header>
         <Header>
-          <Actions>
+          <HeaderWrapper>
             {COMBAT_ACTION_CARDS.map((actionCard) => (
               <HeaderButtonContainer key={actionCard}>
                 <SelectableButton
@@ -557,25 +563,36 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </SelectableButton>
               </HeaderButtonContainer>
             ))}
-          </Actions>
+          </HeaderWrapper>
         </Header>
-        {FACTION_LEADER_ABILITIES[faction] && (
-          <Header>
-            <Technologies>
-              {FACTION_LEADER_ABILITIES[faction].map((leaderAbility) => (
-                <HeaderButtonContainer key={leaderAbility}>
+        <Header>
+          <HeaderWrapper>
+            {AGENDAS.map((agenda) => {
+              return (
+                <HeaderButtonContainer key={agenda}>
                   <SelectableButton
-                    highlightColor="purple"
-                    selected={selectedLeaderAbilities[leaderAbility]}
-                    onClick={() => onAbilitiesLeadersSelected(leaderAbility)}
+                    highlightColor="lightblue"
+                    selected={selectedAgendas[agenda]}
+                    onClick={() => onAgendaSelected(agenda)}
                   >
-                    {leaderAbility}
+                    {agenda}
                   </SelectableButton>
                 </HeaderButtonContainer>
-              ))}
-            </Technologies>
-          </Header>
-        )}
+              );
+            })}
+            {FACTION_LEADER_ABILITIES[faction]?.map((leaderAbility) => (
+              <HeaderButtonContainer key={leaderAbility}>
+                <SelectableButton
+                  highlightColor="purple"
+                  selected={selectedLeaderAbilities[leaderAbility]}
+                  onClick={() => onAbilitiesLeadersSelected(leaderAbility)}
+                >
+                  {leaderAbility}
+                </SelectableButton>
+              </HeaderButtonContainer>
+            ))}
+          </HeaderWrapper>
+        </Header>
         <Content>
           {activeUnits.map((unit) => {
             return (
@@ -660,6 +677,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         <Footer>
           {combatType && (
             <TotalHitsContainer>
+              <Rolling>{rolling > 0 && rollingLabel}</Rolling>
               <TotalLabel>Total:</TotalLabel>
               <TotalHits>{totalHits}</TotalHits>
               <RerollButton onClick={onReroll}>Reroll misses</RerollButton>

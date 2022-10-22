@@ -103,3 +103,5 @@ export type CombatLeaderAbilities =
   | "Rickar Rickani"
   | "Trrakan Aun Zulok";
 export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;
+
+export type CombatAgendaCards = "Prophecy of Ixth";

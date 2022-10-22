@@ -40,6 +40,6 @@ export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
     }
     return moddedCombat;
   },
-  "Plasma Scoring": optimisedRoll(["bombardment"], [1]),
+  "Plasma Scoring": optimisedRoll(["bombardment", "spaceCannon"], [1]),
   Supercharge: combatModFunc([1]),
 };

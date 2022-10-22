@@ -35,6 +35,7 @@ const Container = styled(FactionBackgroundImage)`
 
 const ScrollContainer = styled.div`
   padding: 20px;
+  padding-top: 5px;
   overflow: auto;
   flex: 1;
 `;
@@ -52,7 +53,7 @@ const StyledButton = styled(StylelessButton)`
 `;
 
 const FactionLabel = styled.div`
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,7 +68,7 @@ const FactionHeading = styled.h1`
 
 const Header = styled.div`
   display: flex;
-  padding: 4px;
+  padding-right: 20px;
   justify-content: flex-end;
 `;
 
@@ -172,11 +173,10 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           />
           <FactionHeading>{FACTION_NAMES[faction]}</FactionHeading>
         </FactionLabel>
-
+        <Header>
+          <ClearButton onClick={onClear}>Clear</ClearButton>
+        </Header>
         <ScrollContainer>
-          <Header>
-            <ClearButton onClick={onClear}>Clear</ClearButton>
-          </Header>
           <UnitRow
             limit={1}
             rolls={combat.Flagship.spaceCombat?.rolls}
