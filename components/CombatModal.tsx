@@ -375,12 +375,28 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       }
     });
 
+    // Calculate agendas
+    const agendaCardKeys = Object.keys(selectedAgendas) as CombatAgendaCards[];
+
+    agendaCardKeys.forEach((agendaCardKey) => {
+      if (selectedAgendas[agendaCardKey]) {
+        const modCombat = AGENDA_COMBAT[agendaCardKey](
+          initialUnitCombat,
+          numUnits
+        );
+        if (modCombat) {
+          _unitCombat = deepmerge(_unitCombat, modCombat);
+        }
+      }
+    });
+
     return _unitCombat;
   }, [
     initialUnitCombat,
     selectedTechnologies,
     selectedActionCards,
     selectedLeaderAbilities,
+    selectedAgendas,
     numUnits,
   ]);
 
