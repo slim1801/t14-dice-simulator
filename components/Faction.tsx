@@ -7,6 +7,7 @@ import deepmerge from "deepmerge";
 import Image from "next/image";
 import styled from "styled-components";
 import { useCallback, useMemo, useState } from "react";
+import Link from "next/link";
 import UnitRow from "./UnitRow";
 import UnitIcon from "./UnitIcon";
 import CombatModal from "./CombatModal";
@@ -54,6 +55,7 @@ const StyledButton = styled(StylelessButton)`
 
 const FactionLabel = styled.div`
   margin-top: 20px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -69,7 +71,13 @@ const FactionHeading = styled.h1`
 const Header = styled.div`
   display: flex;
   padding-right: 20px;
+  padding-bottom: 10px;
   justify-content: flex-end;
+`;
+
+const BackButton = styled(StylelessButton)`
+  text-decoration: underline;
+  padding-left: 20px;
 `;
 
 const ClearButton = styled(StylelessButton)`
@@ -174,6 +182,12 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           <FactionHeading>{FACTION_NAMES[faction]}</FactionHeading>
         </FactionLabel>
         <Header>
+          <Link href="/">
+            <a>
+              <BackButton>Back</BackButton>
+            </a>
+          </Link>
+          <div style={{ flex: 1 }} />
           <ClearButton onClick={onClear}>Clear</ClearButton>
         </Header>
         <ScrollContainer>

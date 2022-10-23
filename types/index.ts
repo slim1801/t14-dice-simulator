@@ -105,3 +105,17 @@ export type CombatLeaderAbilities =
 export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;
 
 export type CombatAgendaCards = "Prophecy of Ixth";
+
+export type Flagships =
+  | "Wrath of Kenara"
+  | "Matriarch"
+  | "The Alastoir"
+  | "C'Morran N'orr"
+  | "Arvicon Rex"
+  | "Visz El Vir";
+interface Flagship {
+  name: Flagships;
+  combatFunc: CombatEvalFunc;
+}
+
+export type FactionFlagships = Record<Factions, Flagship | null>;

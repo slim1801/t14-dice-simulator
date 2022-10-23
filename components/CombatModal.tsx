@@ -27,6 +27,7 @@ import {
 } from "../constants/leaders";
 import SelectableButton from "./SelectableButton";
 import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
+import { FACTION_FLAGSHIPS } from "../constants/flagships";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -41,7 +42,7 @@ const ModalContent = styled.div`
   flex-flow: column;
   width: 90%;
   max-width: 700px;
-  height: 80%;
+  height: 90%;
   background-color: white;
   color: black;
 `;
@@ -135,6 +136,7 @@ const DiceHit = styled.span`
 `;
 
 const TotalUnitHitContainer = styled.div`
+  width: 30px;
   color: red;
   font-weight: 500;
   font-size: 30px;
@@ -292,6 +294,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     defaultSelectedAbilitiesLeaders
   );
 
+  const [flagshipSelected, setFlagshipSelected] = useState(false);
+
   const onAbilitiesLeadersSelected = useCallback(
     (leadersAbility: CombatLeaderAbilities) => {
       setSelectedAbilitiesLeaders((prevState) => ({
@@ -390,6 +394,21 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       }
     });
 
+    // Calculate flagships
+    if (
+      FACTION_FLAGSHIPS[faction] &&
+      flagshipSelected &&
+      _numUnits.Flagship > 0
+    ) {
+      const modCombat = FACTION_FLAGSHIPS[faction]?.combatFunc?.(
+        initialUnitCombat,
+        numUnits
+      );
+      if (modCombat) {
+        _unitCombat = deepmerge(_unitCombat, modCombat);
+      }
+    }
+
     return _unitCombat;
   }, [
     initialUnitCombat,
@@ -397,6 +416,9 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     selectedActionCards,
     selectedLeaderAbilities,
     selectedAgendas,
+    faction,
+    flagshipSelected,
+    _numUnits.Flagship,
     numUnits,
   ]);
 
@@ -503,9 +525,12 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
   const totalHits = useMemo(() => {
     const units = Object.keys(totalUnitHits) as Units[];
-    return units.reduce((acc, unit) => {
-      return acc + totalUnitHits[unit];
-    }, 0);
+    if (units.length > 0) {
+      return units.reduce((acc, unit) => {
+        return acc + totalUnitHits[unit];
+      }, 0);
+    }
+    return null;
   }, [totalUnitHits]);
 
   const rollingLabel = useMemo(() => {
@@ -607,6 +632,17 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </SelectableButton>
               </HeaderButtonContainer>
             ))}
+            {_numUnits.Flagship > 0 && FACTION_FLAGSHIPS[faction] && (
+              <HeaderButtonContainer>
+                <SelectableButton
+                  highlightColor="purple"
+                  selected={flagshipSelected}
+                  onClick={() => setFlagshipSelected(!flagshipSelected)}
+                >
+                  {FACTION_FLAGSHIPS[faction]?.name}
+                </SelectableButton>
+              </HeaderButtonContainer>
+            )}
           </HeaderWrapper>
         </Header>
         <Content>
@@ -693,9 +729,15 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         <Footer>
           {combatType && (
             <TotalHitsContainer>
-              <Rolling>{rolling > 0 && rollingLabel}</Rolling>
+              <Rolling>
+                {rolling > 0
+                  ? rollingLabel
+                  : !!(totalHits !== null && totalHits === 0) && "No hits"}
+              </Rolling>
               <TotalLabel>Total:</TotalLabel>
-              <TotalHits>{totalHits}</TotalHits>
+              <TotalHits>
+                {Object.keys(rolls).length > 0 ? totalHits : "-"}
+              </TotalHits>
               <RerollButton onClick={onReroll}>Reroll misses</RerollButton>
             </TotalHitsContainer>
           )}
