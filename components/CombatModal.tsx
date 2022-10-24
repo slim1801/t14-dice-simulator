@@ -136,11 +136,12 @@ const DiceHit = styled.span`
 `;
 
 const TotalUnitHitContainer = styled.div`
-  width: 30px;
+  justify-content: right;
+  width: 40px;
   color: red;
   font-weight: 500;
   font-size: 30px;
-  padding-right: 18px;
+  padding-right: 10px;
   display: flex;
   align-items: center;
 `;
@@ -683,7 +684,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                       <RollSet key={index}>
                         [{rollSet}]
                         <CombatStrength>
-                          {rollSets[0]?.combatStrength}
+                          {rollSets[0]?.combatStrength || 1}
                         </CombatStrength>
                       </RollSet>
                     );
