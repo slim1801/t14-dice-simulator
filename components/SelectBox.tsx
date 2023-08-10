@@ -38,7 +38,7 @@ const SelectBox: React.FunctionComponent<SelectBoxProps> = ({
         onChange?.(e);
       }}
     >
-      <option value=""> -- select faction tech -- </option>
+      <option value=""> -- select tech -- </option>
       {options?.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}

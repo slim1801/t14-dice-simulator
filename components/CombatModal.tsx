@@ -206,6 +206,7 @@ const HeaderWrapper = styled.div`
   padding-left: 5px;
   flex: 1;
   display: flex;
+  flex-wrap: wrap;
 `;
 
 const HeaderButtonContainer = styled.div`
@@ -729,17 +730,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         </Header>
         <Header>
           <HeaderWrapper>
-            {COMBAT_ACTION_CARDS.map((actionCard) => (
-              <HeaderButtonContainer key={actionCard}>
-                <SelectableButton
-                  highlightColor="orange"
-                  selected={selectedActionCards[actionCard]}
-                  onClick={() => onActionCardSelected(actionCard)}
-                >
-                  {actionCard}
-                </SelectableButton>
-              </HeaderButtonContainer>
-            ))}
             {AGENDAS.map((agenda) => {
               return (
                 <HeaderButtonContainer key={agenda}>
@@ -753,6 +743,17 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </HeaderButtonContainer>
               );
             })}
+            {COMBAT_ACTION_CARDS.map((actionCard) => (
+              <HeaderButtonContainer key={actionCard}>
+                <SelectableButton
+                  highlightColor="orange"
+                  selected={selectedActionCards[actionCard]}
+                  onClick={() => onActionCardSelected(actionCard)}
+                >
+                  {actionCard}
+                </SelectableButton>
+              </HeaderButtonContainer>
+            ))}
           </HeaderWrapper>
         </Header>
         <Header>
