@@ -1,6 +1,7 @@
 import {
   CombatEvalFunc,
   CombatTechnology,
+  FactionExclusiveTechnology,
   FactionTechnologies,
   UnitCombat,
   Units,
@@ -40,6 +41,20 @@ export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
     }
     return moddedCombat;
   },
-  "Plasma Scoring": optimisedRoll(["bombardment", "spaceCannon"], [1]),
+  "Plasma Scoring": optimisedRoll(
+    ["bombardment", "antiFighterBarrage", "spaceCannon", "groundSpaceCannon"],
+    [1]
+  ),
   Supercharge: combatModFunc([1]),
 };
+
+export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveTechnology[] = [
+  "Spec Ops II",
+  "Super-Dreadnought II",
+  "Hybrid Crystal Fighter II",
+  "Exotrireme II",
+  "Strike Wing Alpha II",
+  "Supercharge",
+  "Memoria II",
+  "Hel Titan II",
+];

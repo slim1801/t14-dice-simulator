@@ -1,33 +1,50 @@
-import {
-  CombatLeaderAbilities,
-  CombatEvalFunc,
-  FactionLeaderAbilities,
-} from "../types";
+import { CombatLeaderAbilities, CombatEvalFunc } from "../types";
 import { combatModFunc, optimisedRoll } from "../utils/combat";
-import { ALL_FACTIONS } from "./factions";
 
-export const FACTION_LEADER_ABILITIES: FactionLeaderAbilities =
-  ALL_FACTIONS.reduce((acc, faction) => {
-    if (faction === "Barony") {
-      acc[faction] = ["Viscount Unlenn"];
-    } else if (faction === "Winnu") {
-      acc[faction] = ["Rickar Rickani"];
-    } else if (faction === "Argent") {
-      acc[faction] = ["Trrakan Aun Zulok"];
-    } else {
-      acc[faction] = [];
-    }
-    return acc;
-  }, {} as FactionLeaderAbilities);
+export const FACTION_COMBAT_LEADERS: CombatLeaderAbilities[] = [
+  "Viscount Unlenn",
+  "Rickar Rickani",
+  "Evelyn Delouis",
+  "Trrakan Aun Zulok",
+  "Ta Zern",
+];
 
 export const LEADER_ABILITIES_COMBAT: Record<
   CombatLeaderAbilities,
   CombatEvalFunc
 > = {
-  "Viscount Unlenn": combatModFunc([1]),
+  "Viscount Unlenn": optimisedRoll(["spaceCombat"], [1]),
+  "Evelyn Delouis": optimisedRoll(["groundCombat"], [1]),
   "Rickar Rickani": combatModFunc([2]),
+  "Ta Zern": () => {
+    return {
+      War_Sun: {
+        bombardment: {
+          rerollMisses: true,
+        },
+      },
+      Dreadnought: {
+        bombardment: {
+          rerollMisses: true,
+        },
+      },
+      Destroyer: {
+        antiFighterBarrage: {
+          rerollMisses: true,
+        },
+      },
+      PDS: {
+        spaceCannon: {
+          rerollMisses: true,
+        },
+        groundSpaceCannon: {
+          rerollMisses: true,
+        },
+      },
+    };
+  },
   "Trrakan Aun Zulok": optimisedRoll(
-    ["bombardment", "antiFighterBarrage"],
+    ["bombardment", "antiFighterBarrage", "spaceCannon", "groundSpaceCannon"],
     [1]
   ),
 };

@@ -42,6 +42,8 @@ export interface CombatDetails {
   combat?: number;
   combatMod?: number[];
   additional?: CombatDetails[];
+  rerollMisses?: boolean;
+  numUnitsMod?: number[];
 }
 
 export type CombatType =
@@ -59,12 +61,14 @@ export type Combat = {
 export interface UnitHit {
   hit: boolean;
   roll: number;
+  reroll?: number;
   combatStrength: number;
 }
 
 export interface UnitRoll {
   combat?: number;
   rolls: number[];
+  rerolls?: number[];
 }
 
 export type NumUnits = Record<Units, number>;
@@ -96,25 +100,47 @@ interface Technology {
   type: TechnologyType;
 }
 
+export type FactionExclusiveUnitCombatTechnology =
+  | "Spec Ops II"
+  | "Super-Dreadnought II"
+  | "Hybrid Crystal Fighter II"
+  | "Exotrireme II"
+  | "Strike Wing Alpha II"
+  | "Memoria II"
+  | "Hel Titan II";
+
+export type FactionExclusiveCombatTechnology = "Supercharge";
+
+export type FactionExclusiveTechnology =
+  | FactionExclusiveCombatTechnology
+  | FactionExclusiveUnitCombatTechnology;
+
 export type FactionTechnologies = Record<Factions, Technology[]>;
+
+export type FactionExclusives = "Mordred" | "Ul The Progenitor";
 
 export type CombatLeaderAbilities =
   | "Viscount Unlenn"
   | "Rickar Rickani"
-  | "Trrakan Aun Zulok";
+  | "Evelyn Delouis"
+  | "Trrakan Aun Zulok"
+  | "Ta Zern";
 export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;
+export type FactionExclusiveAbilities = Record<Factions, FactionExclusives[]>;
 
 export type CombatAgendaCards = "Prophecy of Ixth";
 
 export type Flagships =
   | "Wrath of Kenara"
   | "Matriarch"
-  | "The Alastoir"
+  | "The Alastor"
   | "C'Morran N'orr"
   | "Arvicon Rex"
   | "Visz El Vir";
+
 interface Flagship {
   name: Flagships;
+  selectable?: boolean;
   combatFunc: CombatEvalFunc;
 }
 

@@ -1,45 +1,11 @@
-import { FactionFlagships, UnitCombat } from "../types";
+import { FactionFlagships, NumUnits, UnitCombat } from "../types";
 
 export const FACTION_FLAGSHIPS: FactionFlagships = {
   Arborec: null,
   Barony: null,
   Saar: null,
   Muaat: null,
-  Hacan: {
-    name: "Wrath of Kenara",
-    combatFunc: () => ({
-      Flagship: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-      War_Sun: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-      Dreadnought: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-      Cruiser: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-      Destroyer: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-      Carrier: {
-        spaceCombat: {
-          combatMod: [1],
-        },
-      },
-    }),
-  },
+  Hacan: null,
   Sol: null,
   Ghosts: null,
   L1Z1X: null,
@@ -58,7 +24,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
     },
   },
   Nekro: {
-    name: "The Alastoir",
+    name: "The Alastor",
     combatFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat) {
         return {
@@ -66,7 +32,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
             spaceCombat: { ...unitCombat.Mech.groundCombat },
           },
           Infantry: {
-            spaceCombat: { ...unitCombat.Mech.groundCombat },
+            spaceCombat: { ...unitCombat.Infantry.groundCombat },
           },
         };
       }
@@ -117,52 +83,53 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   Empyrean: null,
   Mahact: {
     name: "Arvicon Rex",
+    selectable: true,
     combatFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat) {
         return {
           Flagship: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           War_Sun: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Dreadnought: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Cruiser: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Destroyer: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Carrier: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Fighter: {
             spaceCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Mech: {
             groundCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
           Infantry: {
             groundCombat: {
-              combatMod: [1],
+              combatMod: [2],
             },
           },
         };
@@ -172,12 +139,16 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   },
   NaazRokha: {
     name: "Visz El Vir",
-    combatFunc: (unitCombat?: UnitCombat) => {
+    combatFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
       if (unitCombat) {
+        const extraRolls = numUnits?.Mech || 0;
         return {
           Mech: {
+            spaceCombat: {
+              rollMod: [extraRolls],
+            },
             groundCombat: {
-              rollMod: [1],
+              rollMod: [extraRolls],
             },
           },
         };

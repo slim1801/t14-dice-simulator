@@ -1,4 +1,10 @@
-import { Factions, UnitCombat } from "../types";
+import {
+  CombatEvalFunc,
+  FactionExclusiveUnitCombatTechnology,
+  Factions,
+  UnitCombat,
+} from "../types";
+import { combatModFunc } from "../utils/combat";
 
 export const ALL_FACTIONS: Factions[] = [
   "Arborec",
@@ -447,6 +453,9 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       groundSpaceCannon: {
         combat: 6,
       },
+      groundCombat: {
+        combat: 7,
+      },
     },
   },
   Cabal: {
@@ -462,14 +471,83 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
 };
 
-export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
-  Arborec: {
+export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
+  "Spec Ops II": {
     Infantry: {
       groundCombat: {
+        combat: 6,
+      },
+    },
+  },
+  "Super-Dreadnought II": {
+    Dreadnought: {
+      spaceCombat: {
+        combat: 4,
+      },
+      bombardment: {
+        combat: 4,
+      },
+    },
+  },
+  "Hybrid Crystal Fighter II": {
+    Fighter: {
+      spaceCombat: {
         combat: 7,
       },
     },
   },
+  "Exotrireme II": {
+    Dreadnought: {
+      bombardment: {
+        combat: 4,
+        rolls: 2,
+      },
+    },
+  },
+  "Strike Wing Alpha II": {
+    Destroyer: {
+      spaceCombat: {
+        combat: 7,
+      },
+      antiFighterBarrage: {
+        combat: 6,
+        rolls: 3,
+      },
+    },
+  },
+  "Memoria II": {
+    Flagship: {
+      spaceCombat: {
+        combat: 5,
+        rolls: 2,
+      },
+      antiFighterBarrage: {
+        combat: 5,
+        rolls: 3,
+      },
+    },
+  },
+  "Hel Titan II": {
+    PDS: {
+      spaceCannon: {
+        combat: 5,
+      },
+      groundSpaceCannon: {
+        combat: 5,
+      },
+      groundCombat: {
+        combat: 6,
+      },
+    },
+  },
+};
+
+export const FACTION_TECH_COMBAT: Record<string, CombatEvalFunc> = {
+  Supercharge: combatModFunc([1]),
+};
+
+export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
+  Arborec: {},
   Barony: {},
   Saar: {},
   Muaat: {
@@ -491,70 +569,35 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combat: 9,
       },
     },
-    Infantry: {
-      groundCombat: {
-        combat: 6,
-      },
-    },
+    ...FACTION_UNIT_COMBAT["Spec Ops II"],
   },
   Ghosts: {},
   L1Z1X: {
-    Dreadnought: {
-      spaceCombat: {
-        combat: 4,
-      },
-      bombardment: {
-        combat: 4,
-      },
-    },
+    ...FACTION_UNIT_COMBAT["Super-Dreadnought II"],
   },
   Mentak: {},
   Naalu: {
-    Fighter: {
-      spaceCombat: {
-        combat: 7,
-      },
-    },
+    ...FACTION_UNIT_COMBAT["Hybrid Crystal Fighter II"],
   },
   Nekro: {},
-  Sardakk: {},
+  Sardakk: {
+    ...FACTION_UNIT_COMBAT["Exotrireme II"],
+  },
   "Jol-Nar": {},
   Winnu: {},
   Xxcha: {},
   Yin: {},
   Yssaril: {},
   Argent: {
-    Destroyer: {
-      spaceCombat: {
-        combat: 7,
-      },
-      antiFighterBarrage: {
-        combat: 6,
-        rolls: 3,
-      },
-    },
+    ...FACTION_UNIT_COMBAT["Strike Wing Alpha II"],
   },
   Empyrean: {},
   Mahact: {},
   NaazRokha: {},
   Nomad: {
-    Flagship: {
-      spaceCombat: {
-        combat: 5,
-        rolls: 2,
-      },
-      antiFighterBarrage: {
-        combat: 5,
-        rolls: 3,
-      },
-    },
+    ...FACTION_UNIT_COMBAT["Memoria II"],
   },
   Titans: {
-    Cruiser: {
-      spaceCombat: {
-        combat: 6,
-      },
-    },
     PDS: {
       spaceCannon: {
         combat: 5,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import deepmerge from "deepmerge";
 import {
@@ -13,21 +13,36 @@ import {
   CombatActionCards,
   CombatLeaderAbilities,
   CombatAgendaCards,
+  FactionExclusives,
+  FactionExclusiveTechnology,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
 import Combat from "./Combat";
 import RoundButton from "./RoundButton";
 import TechnologyButton from "./TechnologyButton";
-import { FACTION_TECHNOLOGY, TECHNOLOGY_COMBAT } from "../constants/technology";
+import {
+  FACTION_EXCLUSIVE_TECHNOLOGY,
+  FACTION_TECHNOLOGY,
+  TECHNOLOGY_COMBAT,
+} from "../constants/technology";
 import { ACTION_COMBAT, COMBAT_ACTION_CARDS } from "../constants/actions";
 import {
-  FACTION_LEADER_ABILITIES,
+  FACTION_COMBAT_LEADERS,
   LEADER_ABILITIES_COMBAT,
 } from "../constants/leaders";
 import SelectableButton from "./SelectableButton";
 import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
 import { FACTION_FLAGSHIPS } from "../constants/flagships";
+import {
+  FACTION_EXCLUSIVE_ABILITIES,
+  FACTION_EXCLUSIVE_ABILITIES_COMBAT,
+} from "../constants/factionAbilities";
+import SelectBox from "./SelectBox";
+import {
+  FACTION_TECH_COMBAT,
+  FACTION_UNIT_COMBAT,
+} from "../constants/factions";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -198,6 +213,17 @@ const HeaderButtonContainer = styled.div`
   margin-right: 10px;
 `;
 
+const HeaderSelectContainer = styled.div`
+  margin-top: 10px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+`;
+
+const HeaderSelectLabel = styled.div`
+  margin-right: 10px;
+`;
+
 const RollSet = styled.div`
   vertical-align: sub;
 `;
@@ -244,10 +270,11 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   numUnits,
   onClose,
 }) => {
-  const [_numUnits, _setNumUnits] = useState({ ...numUnits });
+  const [localNumUnits, setLocalNumUnits] = useState({ ...numUnits });
+  const [flagshipSelected, setFlagshipSelected] = useState(false);
 
   useEffect(() => {
-    _setNumUnits(numUnits);
+    setLocalNumUnits(numUnits);
   }, [numUnits]);
 
   const defaultSelectedTechs = useMemo(() => {
@@ -285,17 +312,43 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   }, []);
 
   const defaultSelectedAbilitiesLeaders = useMemo(() => {
-    return FACTION_LEADER_ABILITIES[faction].reduce((acc, leaderAbility) => {
+    return FACTION_COMBAT_LEADERS.reduce((acc, leaderAbility) => {
       acc[leaderAbility] = false;
       return acc;
     }, {} as Record<CombatLeaderAbilities, boolean>);
-  }, [faction]);
+  }, []);
 
   const [selectedLeaderAbilities, setSelectedAbilitiesLeaders] = useState(
     defaultSelectedAbilitiesLeaders
   );
 
-  const [flagshipSelected, setFlagshipSelected] = useState(false);
+  const defaultSelectedFactionExclusiveAbilities = useMemo(() => {
+    return FACTION_EXCLUSIVE_ABILITIES[faction].reduce(
+      (acc, factionAbility) => {
+        acc[factionAbility] = false;
+        return acc;
+      },
+      {} as Record<FactionExclusives, boolean>
+    );
+  }, [faction]);
+
+  const [
+    selectedFactionExclusiveAbilities,
+    setSelectedFactionExclusiveAbilities,
+  ] = useState(defaultSelectedFactionExclusiveAbilities);
+
+  const onFactionExclusiveSelected = useCallback(
+    (factionAbility: FactionExclusives) => {
+      setSelectedFactionExclusiveAbilities((prevState) => ({
+        ...prevState,
+        [factionAbility]: !prevState[factionAbility],
+      }));
+    },
+    []
+  );
+
+  const [valefarX, setValefarX] = useState("");
+  const [valefarY, setValefarY] = useState("");
 
   const onAbilitiesLeadersSelected = useCallback(
     (leadersAbility: CombatLeaderAbilities) => {
@@ -319,8 +372,16 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   }, []);
 
   const activeUnits = useMemo(() => {
-    return UnitOrder.filter((unit) => numUnits[unit] > 0);
-  }, [numUnits]);
+    return UnitOrder.filter((unit) => {
+      if (
+        selectedFactionExclusiveAbilities["Ul The Progenitor"] &&
+        unit === "PDS"
+      ) {
+        return true;
+      }
+      return numUnits[unit] > 0;
+    });
+  }, [numUnits, selectedFactionExclusiveAbilities]);
 
   const [rolls, setRolls] = useState<Partial<UnitRolls>>({});
 
@@ -331,14 +392,43 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   const unitCombat = useMemo(() => {
     let _unitCombat: UnitCombat = JSON.parse(JSON.stringify(initialUnitCombat));
 
+    // Apply Nekro Unit Tech
+    const valefarXUnitTech = FACTION_UNIT_COMBAT?.[valefarX];
+    const valefarYUnitTech = FACTION_UNIT_COMBAT?.[valefarY];
+
+    if (valefarXUnitTech) {
+      _unitCombat = deepmerge(_unitCombat, valefarXUnitTech);
+    }
+    if (valefarYUnitTech) {
+      _unitCombat = deepmerge(_unitCombat, valefarYUnitTech);
+    }
+
+    // Apply Nekro Tech
+    const valefarXTech = FACTION_TECH_COMBAT?.[valefarX];
+    const valefarYTech = FACTION_TECH_COMBAT?.[valefarY];
+
+    if (valefarXTech) {
+      const modCombat = valefarXTech(_unitCombat, localNumUnits);
+      if (modCombat) {
+        _unitCombat = deepmerge(_unitCombat, modCombat);
+      }
+    }
+
+    if (valefarYTech) {
+      const modCombat = valefarYTech(_unitCombat, localNumUnits);
+      if (modCombat) {
+        _unitCombat = deepmerge(_unitCombat, modCombat);
+      }
+    }
+
     // Calculate tech
     const techKeys = Object.keys(selectedTechnologies) as CombatTechnology[];
 
     techKeys.forEach((techKey) => {
       if (selectedTechnologies[techKey]) {
         const modCombat = TECHNOLOGY_COMBAT[techKey](
-          initialUnitCombat,
-          numUnits
+          _unitCombat,
+          localNumUnits
         );
         if (modCombat) {
           _unitCombat = deepmerge(_unitCombat, modCombat);
@@ -354,8 +444,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     actionCardKeys.forEach((actionCardKey) => {
       if (selectedActionCards[actionCardKey]) {
         const modActionCombat = ACTION_COMBAT[actionCardKey](
-          initialUnitCombat,
-          numUnits
+          _unitCombat,
+          localNumUnits
         );
         if (modActionCombat) {
           _unitCombat = deepmerge(_unitCombat, modActionCombat);
@@ -371,9 +461,25 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     leaderAbilitiesKeys.forEach((leaderAbilitiesKey) => {
       if (selectedLeaderAbilities[leaderAbilitiesKey]) {
         const modCombat = LEADER_ABILITIES_COMBAT[leaderAbilitiesKey](
-          initialUnitCombat,
-          numUnits
+          _unitCombat,
+          localNumUnits
         );
+        if (modCombat) {
+          _unitCombat = deepmerge(_unitCombat, modCombat);
+        }
+      }
+    });
+
+    // Calculate faction abilities
+    const factionExclusiveAbilitiesKeys = Object.keys(
+      selectedFactionExclusiveAbilities
+    ) as FactionExclusives[];
+
+    factionExclusiveAbilitiesKeys.forEach((factionExclusiveAbilitiesKey) => {
+      if (selectedFactionExclusiveAbilities[factionExclusiveAbilitiesKey]) {
+        const modCombat = FACTION_EXCLUSIVE_ABILITIES_COMBAT[
+          factionExclusiveAbilitiesKey
+        ](_unitCombat, localNumUnits);
         if (modCombat) {
           _unitCombat = deepmerge(_unitCombat, modCombat);
         }
@@ -386,8 +492,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     agendaCardKeys.forEach((agendaCardKey) => {
       if (selectedAgendas[agendaCardKey]) {
         const modCombat = AGENDA_COMBAT[agendaCardKey](
-          initialUnitCombat,
-          numUnits
+          _unitCombat,
+          localNumUnits
         );
         if (modCombat) {
           _unitCombat = deepmerge(_unitCombat, modCombat);
@@ -395,14 +501,15 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       }
     });
 
+    const flagshipSelectable = FACTION_FLAGSHIPS[faction]?.selectable;
+
     // Calculate flagships
     if (
-      FACTION_FLAGSHIPS[faction] &&
-      flagshipSelected &&
-      _numUnits.Flagship > 0
+      (flagshipSelectable && flagshipSelected) ||
+      (!flagshipSelectable && localNumUnits.Flagship > 0)
     ) {
       const modCombat = FACTION_FLAGSHIPS[faction]?.combatFunc?.(
-        initialUnitCombat,
+        _unitCombat,
         numUnits
       );
       if (modCombat) {
@@ -417,9 +524,12 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     selectedActionCards,
     selectedLeaderAbilities,
     selectedAgendas,
+    selectedFactionExclusiveAbilities,
+    valefarX,
+    valefarY,
     faction,
+    localNumUnits,
     flagshipSelected,
-    _numUnits.Flagship,
     numUnits,
   ]);
 
@@ -451,40 +561,59 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         );
 
         activeUnits.forEach((unit) => {
-          if (_numUnits[unit] > 0) {
-            const combatDetails = unitCombat[unit][_combatType];
+          const combatDetails = unitCombat[unit][_combatType];
+          if (localNumUnits[unit] > 0) {
+            const firstRoll = doRolls(
+              localNumUnits[unit],
+              combatDetails?.rolls,
+              combatDetails?.rollMod
+            );
+
             activeRolls[unit] = [
               {
                 combat: combatDetails?.combat,
-                rolls: doRolls(
-                  _numUnits[unit],
-                  combatDetails?.rolls,
-                  combatDetails?.rollMod
-                ),
+                rolls: firstRoll,
+                ...(combatDetails?.rerollMisses && {
+                  rerolls:
+                    combatDetails?.rerollMisses &&
+                    doRolls(
+                      localNumUnits[unit],
+                      combatDetails?.rolls,
+                      combatDetails?.rollMod
+                    ),
+                }),
               },
             ];
+          }
 
-            // Additional Rolls
-            if (combatDetails?.additional) {
-              combatDetails.additional?.forEach((additionalCombat) => {
-                if (additionalCombat.combat) {
-                  activeRolls[unit]?.push({
-                    combat: additionalCombat.combat,
-                    rolls: doRolls(
-                      _numUnits[unit],
-                      additionalCombat.rolls,
-                      additionalCombat.rollMod
-                    ),
-                  });
+          // Additional Rolls
+          if (combatDetails?.additional) {
+            combatDetails.additional?.forEach((additionalCombat) => {
+              if (additionalCombat.combat) {
+                if (!activeRolls[unit]) {
+                  activeRolls[unit] = [];
                 }
-              });
-            }
+                const extraUnits = additionalCombat?.numUnitsMod?.reduce(
+                  (partialSum, a) => partialSum + a,
+                  0
+                );
+                activeRolls[unit]?.push({
+                  combat: additionalCombat.combat,
+                  rolls: doRolls(
+                    localNumUnits[unit] + (extraUnits || 0),
+                    additionalCombat.rolls,
+                    additionalCombat.rollMod
+                  ),
+                });
+              }
+            });
           }
         });
+
         setRolls(activeRolls);
       };
     },
-    [_numUnits, unitCombat, rolling, rollingTimeout]
+    [localNumUnits, unitCombat, rolling, rollingTimeout]
   );
 
   const rollHits = useMemo(() => {
@@ -499,10 +628,16 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
             : [0]
         ).reduce((acc, val) => acc + val, 0);
 
-        return unitRolls.rolls.map((roll) => {
+        return unitRolls.rolls.map((roll, index) => {
+          const reroll = unitRolls.rerolls?.[index];
+
+          const initialHit = roll + combatMod >= combatStrength;
+          const rerollHit =
+            reroll !== undefined && reroll + combatMod >= combatStrength;
           return {
-            hit: roll + combatMod >= combatStrength,
+            hit: initialHit || rerollHit,
             roll,
+            ...(!initialHit && { reroll }),
             combatStrength: combatStrength - combatMod,
           };
         });
@@ -605,10 +740,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </SelectableButton>
               </HeaderButtonContainer>
             ))}
-          </HeaderWrapper>
-        </Header>
-        <Header>
-          <HeaderWrapper>
             {AGENDAS.map((agenda) => {
               return (
                 <HeaderButtonContainer key={agenda}>
@@ -622,7 +753,11 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </HeaderButtonContainer>
               );
             })}
-            {FACTION_LEADER_ABILITIES[faction]?.map((leaderAbility) => (
+          </HeaderWrapper>
+        </Header>
+        <Header>
+          <HeaderWrapper>
+            {FACTION_COMBAT_LEADERS?.map((leaderAbility) => (
               <HeaderButtonContainer key={leaderAbility}>
                 <SelectableButton
                   highlightColor="purple"
@@ -633,26 +768,66 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 </SelectableButton>
               </HeaderButtonContainer>
             ))}
-            {_numUnits.Flagship > 0 && FACTION_FLAGSHIPS[faction] && (
-              <HeaderButtonContainer>
+            {FACTION_EXCLUSIVE_ABILITIES[faction]?.map((factionAbility) => (
+              <HeaderButtonContainer key={factionAbility}>
                 <SelectableButton
                   highlightColor="purple"
-                  selected={flagshipSelected}
-                  onClick={() => setFlagshipSelected(!flagshipSelected)}
+                  selected={selectedFactionExclusiveAbilities[factionAbility]}
+                  onClick={() => onFactionExclusiveSelected(factionAbility)}
                 >
-                  {FACTION_FLAGSHIPS[faction]?.name}
+                  {factionAbility}
                 </SelectableButton>
               </HeaderButtonContainer>
-            )}
+            ))}
+            {localNumUnits.Flagship > 0 &&
+              FACTION_FLAGSHIPS[faction]?.selectable && (
+                <HeaderButtonContainer>
+                  <SelectableButton
+                    highlightColor="purple"
+                    selected={flagshipSelected}
+                    onClick={() => setFlagshipSelected(!flagshipSelected)}
+                  >
+                    {FACTION_FLAGSHIPS[faction]?.name}
+                  </SelectableButton>
+                </HeaderButtonContainer>
+              )}
           </HeaderWrapper>
         </Header>
+        {faction === "Nekro" && (
+          <Header>
+            <HeaderWrapper>
+              <HeaderSelectContainer>
+                <HeaderSelectLabel>X:</HeaderSelectLabel>
+                <SelectBox
+                  options={FACTION_EXCLUSIVE_TECHNOLOGY.map((factionTech) => ({
+                    label: factionTech,
+                    value: factionTech,
+                  }))}
+                  onChange={(e) => setValefarX(e.target.value)}
+                  value={valefarX}
+                />
+              </HeaderSelectContainer>
+              <HeaderSelectContainer>
+                <HeaderSelectLabel>Y:</HeaderSelectLabel>
+                <SelectBox
+                  options={FACTION_EXCLUSIVE_TECHNOLOGY.map((factionTech) => ({
+                    label: factionTech,
+                    value: factionTech,
+                  }))}
+                  onChange={(e) => setValefarY(e.target.value)}
+                  value={valefarY}
+                />
+              </HeaderSelectContainer>
+            </HeaderWrapper>
+          </Header>
+        )}
         <Content>
           {activeUnits.map((unit) => {
             return (
               <CombatUnitRow key={unit}>
                 <IconContainer>
                   <IconImage faction={faction} unit={unit} />
-                  <NumUnitsContainer>x{_numUnits[unit]}</NumUnitsContainer>
+                  <NumUnitsContainer>x{localNumUnits[unit]}</NumUnitsContainer>
                 </IconContainer>
                 <Combat
                   combat={
@@ -663,23 +838,36 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 />
                 <RollContainer>
                   {rollHits[unit]?.map((rollSets, index) => {
-                    const rollSet = rollSets.map(({ roll, hit }, _index) => {
-                      const comma = _index < rollSets.length - 1 ? ", " : "";
-                      if (hit) {
+                    const rollSet = rollSets.map(
+                      ({ roll, hit, reroll }, _index) => {
+                        const comma = _index < rollSets.length - 1 ? ", " : "";
+                        if (hit) {
+                          if (reroll !== undefined) {
+                            return (
+                              <Fragment key={_index}>
+                                <span>{`${roll}->`}</span>
+                                <DiceHit>{reroll}</DiceHit>
+                                <span>{comma}</span>
+                              </Fragment>
+                            );
+                          } else {
+                            return (
+                              <Fragment key={_index}>
+                                <DiceHit>{roll}</DiceHit>
+                                <span>{comma}</span>
+                              </Fragment>
+                            );
+                          }
+                        }
                         return (
-                          <DiceHit key={_index}>
+                          <span key={_index}>
                             {roll}
+                            {reroll !== undefined && `->${reroll}`}
                             {comma}
-                          </DiceHit>
+                          </span>
                         );
                       }
-                      return (
-                        <span key={_index}>
-                          {roll}
-                          {comma}
-                        </span>
-                      );
-                    });
+                    );
                     return (
                       <RollSet key={index}>
                         [{rollSet}]
@@ -697,11 +885,11 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                   <RoundButton
                     radius={15}
                     color="black"
-                    disabled={_numUnits[unit] === 0}
+                    disabled={localNumUnits[unit] === 0}
                     onClick={() =>
-                      _setNumUnits((prevState) => ({
+                      setLocalNumUnits((prevState) => ({
                         ...prevState,
-                        [unit]: _numUnits[unit] - 1,
+                        [unit]: prevState[unit] - 1,
                       }))
                     }
                   >
@@ -712,11 +900,11 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                   <RoundButton
                     radius={15}
                     color="black"
-                    disabled={_numUnits[unit] === numUnits[unit]}
+                    disabled={localNumUnits[unit] === numUnits[unit]}
                     onClick={() =>
-                      _setNumUnits((prevState) => ({
+                      setLocalNumUnits((prevState) => ({
                         ...prevState,
-                        [unit]: _numUnits[unit] + 1,
+                        [unit]: prevState[unit] + 1,
                       }))
                     }
                   >

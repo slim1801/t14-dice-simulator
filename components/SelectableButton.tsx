@@ -1,18 +1,18 @@
 import { PropsWithChildren } from "react";
 import styled, { css } from "styled-components";
 
-interface ActionCardButtonProps {
+interface SelectableButtonProps {
   selected: boolean;
   highlightColor: string;
   onClick: () => void;
 }
 
-interface ActionButtonComponentProps {
+interface SelectableButtonComponentProps {
   selected: boolean;
   highlightColor: string;
 }
 
-const ActionCardButtonComponent = styled.button<ActionButtonComponentProps>`
+const SelectableButtonComponent = styled.button<SelectableButtonComponentProps>`
   padding: 5px;
   display: flex;
   justify-content: center;
@@ -32,16 +32,16 @@ const ActionCardButtonComponent = styled.button<ActionButtonComponentProps>`
 `;
 
 const SelectableButton: React.FunctionComponent<
-  PropsWithChildren<ActionCardButtonProps>
+  PropsWithChildren<SelectableButtonProps>
 > = ({ children, highlightColor, selected, onClick }) => {
   return (
-    <ActionCardButtonComponent
+    <SelectableButtonComponent
       highlightColor={highlightColor}
       selected={selected}
       onClick={() => onClick?.()}
     >
       {children}
-    </ActionCardButtonComponent>
+    </SelectableButtonComponent>
   );
 };
 
