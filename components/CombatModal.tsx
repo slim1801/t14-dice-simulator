@@ -43,6 +43,7 @@ import {
   FACTION_TECH_COMBAT,
   FACTION_UNIT_COMBAT,
 } from "../constants/factions";
+import Accordion from "./Accordion";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -713,115 +714,127 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     <Overlay>
       <ModalContent>
         <Header>
-          <HeaderWrapper>
-            {FACTION_TECHNOLOGY[faction].map((tech) => (
-              <HeaderButtonContainer key={tech.name}>
-                <TechnologyButton
-                  type={tech.type}
-                  selected={selectedTechnologies[tech.name]}
-                  onClick={() => onTechSelected(tech.name)}
-                >
-                  {tech.name}
-                </TechnologyButton>
-              </HeaderButtonContainer>
-            ))}
-          </HeaderWrapper>
           <CloseButton onClick={onClose}>X</CloseButton>
         </Header>
-        <Header>
-          <HeaderWrapper>
-            {AGENDAS.map((agenda) => {
-              return (
-                <HeaderButtonContainer key={agenda}>
-                  <SelectableButton
-                    highlightColor="lightblue"
-                    selected={selectedAgendas[agenda]}
-                    onClick={() => onAgendaSelected(agenda)}
-                  >
-                    {agenda}
-                  </SelectableButton>
-                </HeaderButtonContainer>
-              );
-            })}
-            {COMBAT_ACTION_CARDS.map((actionCard) => (
-              <HeaderButtonContainer key={actionCard}>
-                <SelectableButton
-                  highlightColor="orange"
-                  selected={selectedActionCards[actionCard]}
-                  onClick={() => onActionCardSelected(actionCard)}
-                >
-                  {actionCard}
-                </SelectableButton>
-              </HeaderButtonContainer>
-            ))}
-          </HeaderWrapper>
-        </Header>
-        <Header>
-          <HeaderWrapper>
-            {FACTION_COMBAT_LEADERS?.map((leaderAbility) => (
-              <HeaderButtonContainer key={leaderAbility}>
-                <SelectableButton
-                  highlightColor="purple"
-                  selected={selectedLeaderAbilities[leaderAbility]}
-                  onClick={() => onAbilitiesLeadersSelected(leaderAbility)}
-                >
-                  {leaderAbility}
-                </SelectableButton>
-              </HeaderButtonContainer>
-            ))}
-            {FACTION_EXCLUSIVE_ABILITIES[faction]?.map((factionAbility) => (
-              <HeaderButtonContainer key={factionAbility}>
-                <SelectableButton
-                  highlightColor="purple"
-                  selected={selectedFactionExclusiveAbilities[factionAbility]}
-                  onClick={() => onFactionExclusiveSelected(factionAbility)}
-                >
-                  {factionAbility}
-                </SelectableButton>
-              </HeaderButtonContainer>
-            ))}
-            {localNumUnits.Flagship > 0 &&
-              FACTION_FLAGSHIPS[faction]?.selectable && (
-                <HeaderButtonContainer>
-                  <SelectableButton
-                    highlightColor="purple"
-                    selected={flagshipSelected}
-                    onClick={() => setFlagshipSelected(!flagshipSelected)}
-                  >
-                    {FACTION_FLAGSHIPS[faction]?.name}
-                  </SelectableButton>
-                </HeaderButtonContainer>
-              )}
-          </HeaderWrapper>
-        </Header>
-        {faction === "Nekro" && (
-          <Header>
-            <HeaderWrapper>
-              <HeaderSelectContainer>
-                <HeaderSelectLabel>X:</HeaderSelectLabel>
-                <SelectBox
-                  options={FACTION_EXCLUSIVE_TECHNOLOGY.map((factionTech) => ({
-                    label: factionTech,
-                    value: factionTech,
-                  }))}
-                  onChange={(e) => setValefarX(e.target.value)}
-                  value={valefarX}
-                />
-              </HeaderSelectContainer>
-              <HeaderSelectContainer>
-                <HeaderSelectLabel>Y:</HeaderSelectLabel>
-                <SelectBox
-                  options={FACTION_EXCLUSIVE_TECHNOLOGY.map((factionTech) => ({
-                    label: factionTech,
-                    value: factionTech,
-                  }))}
-                  onChange={(e) => setValefarY(e.target.value)}
-                  value={valefarY}
-                />
-              </HeaderSelectContainer>
-            </HeaderWrapper>
-          </Header>
-        )}
+        <Accordion label="Modifiers">
+          <>
+            <Header>
+              <HeaderWrapper>
+                {FACTION_TECHNOLOGY[faction].map((tech) => (
+                  <HeaderButtonContainer key={tech.name}>
+                    <TechnologyButton
+                      type={tech.type}
+                      selected={selectedTechnologies[tech.name]}
+                      onClick={() => onTechSelected(tech.name)}
+                    >
+                      {tech.name}
+                    </TechnologyButton>
+                  </HeaderButtonContainer>
+                ))}
+              </HeaderWrapper>
+            </Header>
+            <Header>
+              <HeaderWrapper>
+                {AGENDAS.map((agenda) => {
+                  return (
+                    <HeaderButtonContainer key={agenda}>
+                      <SelectableButton
+                        highlightColor="lightblue"
+                        selected={selectedAgendas[agenda]}
+                        onClick={() => onAgendaSelected(agenda)}
+                      >
+                        {agenda}
+                      </SelectableButton>
+                    </HeaderButtonContainer>
+                  );
+                })}
+                {COMBAT_ACTION_CARDS.map((actionCard) => (
+                  <HeaderButtonContainer key={actionCard}>
+                    <SelectableButton
+                      highlightColor="orange"
+                      selected={selectedActionCards[actionCard]}
+                      onClick={() => onActionCardSelected(actionCard)}
+                    >
+                      {actionCard}
+                    </SelectableButton>
+                  </HeaderButtonContainer>
+                ))}
+              </HeaderWrapper>
+            </Header>
+            <Header>
+              <HeaderWrapper>
+                {FACTION_COMBAT_LEADERS?.map((leaderAbility) => (
+                  <HeaderButtonContainer key={leaderAbility}>
+                    <SelectableButton
+                      highlightColor="purple"
+                      selected={selectedLeaderAbilities[leaderAbility]}
+                      onClick={() => onAbilitiesLeadersSelected(leaderAbility)}
+                    >
+                      {leaderAbility}
+                    </SelectableButton>
+                  </HeaderButtonContainer>
+                ))}
+                {FACTION_EXCLUSIVE_ABILITIES[faction]?.map((factionAbility) => (
+                  <HeaderButtonContainer key={factionAbility}>
+                    <SelectableButton
+                      highlightColor="purple"
+                      selected={
+                        selectedFactionExclusiveAbilities[factionAbility]
+                      }
+                      onClick={() => onFactionExclusiveSelected(factionAbility)}
+                    >
+                      {factionAbility}
+                    </SelectableButton>
+                  </HeaderButtonContainer>
+                ))}
+                {localNumUnits.Flagship > 0 &&
+                  FACTION_FLAGSHIPS[faction]?.selectable && (
+                    <HeaderButtonContainer>
+                      <SelectableButton
+                        highlightColor="purple"
+                        selected={flagshipSelected}
+                        onClick={() => setFlagshipSelected(!flagshipSelected)}
+                      >
+                        {FACTION_FLAGSHIPS[faction]?.name}
+                      </SelectableButton>
+                    </HeaderButtonContainer>
+                  )}
+              </HeaderWrapper>
+            </Header>
+            {faction === "Nekro" && (
+              <Header>
+                <HeaderWrapper>
+                  <HeaderSelectContainer>
+                    <HeaderSelectLabel>X:</HeaderSelectLabel>
+                    <SelectBox
+                      options={FACTION_EXCLUSIVE_TECHNOLOGY.map(
+                        (factionTech) => ({
+                          label: factionTech,
+                          value: factionTech,
+                        })
+                      )}
+                      onChange={(e) => setValefarX(e.target.value)}
+                      value={valefarX}
+                    />
+                  </HeaderSelectContainer>
+                  <HeaderSelectContainer>
+                    <HeaderSelectLabel>Y:</HeaderSelectLabel>
+                    <SelectBox
+                      options={FACTION_EXCLUSIVE_TECHNOLOGY.map(
+                        (factionTech) => ({
+                          label: factionTech,
+                          value: factionTech,
+                        })
+                      )}
+                      onChange={(e) => setValefarY(e.target.value)}
+                      value={valefarY}
+                    />
+                  </HeaderSelectContainer>
+                </HeaderWrapper>
+              </Header>
+            )}
+          </>
+        </Accordion>
         <Content>
           {activeUnits.map((unit) => {
             return (
