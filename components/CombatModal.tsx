@@ -14,7 +14,8 @@ import {
   CombatLeaderAbilities,
   CombatAgendaCards,
   FactionExclusives,
-  FactionExclusiveTechnology,
+  PromissoryNotes,
+  CombatEvalFuncState,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -44,6 +45,10 @@ import {
   FACTION_UNIT_COMBAT,
 } from "../constants/factions";
 import Accordion from "./Accordion";
+import {
+  PROMISSORY_NOTES,
+  PROMISSORY_NOTE_COMBAT,
+} from "../constants/promissory";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -334,6 +339,24 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     );
   }, [faction]);
 
+  const defaultPromissoryNotes = useMemo(() => {
+    return PROMISSORY_NOTES.reduce((acc, note) => {
+      acc[note] = false;
+      return acc;
+    }, {} as Record<PromissoryNotes, boolean>);
+  }, []);
+
+  const [selectedPromissoryNotes, setSelectedPromissoryNotes] = useState(
+    defaultPromissoryNotes
+  );
+
+  const onPromissoryNoteSelected = useCallback((note: PromissoryNotes) => {
+    setSelectedPromissoryNotes((prevState) => ({
+      ...prevState,
+      [note]: !prevState[note],
+    }));
+  }, []);
+
   const [
     selectedFactionExclusiveAbilities,
     setSelectedFactionExclusiveAbilities,
@@ -381,9 +404,16 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       ) {
         return true;
       }
+      if (
+        (selectedPromissoryNotes["The Cavalry (Memoria)"] ||
+          selectedPromissoryNotes["The Cavalry (Memoria II)"]) &&
+        unit === "Flagship"
+      ) {
+        return true;
+      }
       return numUnits[unit] > 0;
     });
-  }, [numUnits, selectedFactionExclusiveAbilities]);
+  }, [numUnits, selectedPromissoryNotes, selectedFactionExclusiveAbilities]);
 
   const [rolls, setRolls] = useState<Partial<UnitRolls>>({});
 
@@ -391,8 +421,47 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
   const [rolling, setRolling] = useState(0);
 
-  const unitCombat = useMemo(() => {
+  const { unitCombat, additionalUnitCombat } = useMemo(() => {
     let _unitCombat: UnitCombat = JSON.parse(JSON.stringify(initialUnitCombat));
+    let _additionalUnitCombat: UnitCombat = {
+      Flagship: {},
+      War_Sun: {},
+      Cruiser: {},
+      Dreadnought: {},
+      Destroyer: {},
+      Carrier: {},
+      Fighter: {},
+      PDS: {},
+      Mech: {},
+      Infantry: {},
+    };
+
+    const runCombatEvalFunc = (
+      combatEvalState?: CombatEvalFuncState | null
+    ) => {
+      if (combatEvalState) {
+        if (combatEvalState.additional) {
+          const additionalModCombat = combatEvalState.combatEvalFunc(
+            _additionalUnitCombat,
+            localNumUnits
+          );
+          if (additionalModCombat) {
+            _additionalUnitCombat = deepmerge(
+              _additionalUnitCombat,
+              additionalModCombat
+            );
+          }
+        } else {
+          const modCombat = combatEvalState.combatEvalFunc(
+            _unitCombat,
+            localNumUnits
+          );
+          if (modCombat) {
+            _unitCombat = deepmerge(_unitCombat, modCombat);
+          }
+        }
+      }
+    };
 
     // Apply Nekro Unit Tech
     const valefarXUnitTech = FACTION_UNIT_COMBAT?.[valefarX];
@@ -407,34 +476,17 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     // Apply Nekro Tech
     const valefarXTech = FACTION_TECH_COMBAT?.[valefarX];
+    runCombatEvalFunc(valefarXTech);
+
     const valefarYTech = FACTION_TECH_COMBAT?.[valefarY];
-
-    if (valefarXTech) {
-      const modCombat = valefarXTech(_unitCombat, localNumUnits);
-      if (modCombat) {
-        _unitCombat = deepmerge(_unitCombat, modCombat);
-      }
-    }
-
-    if (valefarYTech) {
-      const modCombat = valefarYTech(_unitCombat, localNumUnits);
-      if (modCombat) {
-        _unitCombat = deepmerge(_unitCombat, modCombat);
-      }
-    }
+    runCombatEvalFunc(valefarYTech);
 
     // Calculate tech
     const techKeys = Object.keys(selectedTechnologies) as CombatTechnology[];
 
     techKeys.forEach((techKey) => {
       if (selectedTechnologies[techKey]) {
-        const modCombat = TECHNOLOGY_COMBAT[techKey](
-          _unitCombat,
-          localNumUnits
-        );
-        if (modCombat) {
-          _unitCombat = deepmerge(_unitCombat, modCombat);
-        }
+        runCombatEvalFunc(TECHNOLOGY_COMBAT[techKey]);
       }
     });
 
@@ -445,13 +497,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     actionCardKeys.forEach((actionCardKey) => {
       if (selectedActionCards[actionCardKey]) {
-        const modActionCombat = ACTION_COMBAT[actionCardKey](
-          _unitCombat,
-          localNumUnits
-        );
-        if (modActionCombat) {
-          _unitCombat = deepmerge(_unitCombat, modActionCombat);
-        }
+        runCombatEvalFunc(ACTION_COMBAT[actionCardKey]);
       }
     });
 
@@ -462,13 +508,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     leaderAbilitiesKeys.forEach((leaderAbilitiesKey) => {
       if (selectedLeaderAbilities[leaderAbilitiesKey]) {
-        const modCombat = LEADER_ABILITIES_COMBAT[leaderAbilitiesKey](
-          _unitCombat,
-          localNumUnits
-        );
-        if (modCombat) {
-          _unitCombat = deepmerge(_unitCombat, modCombat);
-        }
+        runCombatEvalFunc(LEADER_ABILITIES_COMBAT[leaderAbilitiesKey]);
       }
     });
 
@@ -479,12 +519,20 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     factionExclusiveAbilitiesKeys.forEach((factionExclusiveAbilitiesKey) => {
       if (selectedFactionExclusiveAbilities[factionExclusiveAbilitiesKey]) {
-        const modCombat = FACTION_EXCLUSIVE_ABILITIES_COMBAT[
-          factionExclusiveAbilitiesKey
-        ](_unitCombat, localNumUnits);
-        if (modCombat) {
-          _unitCombat = deepmerge(_unitCombat, modCombat);
-        }
+        runCombatEvalFunc(
+          FACTION_EXCLUSIVE_ABILITIES_COMBAT[factionExclusiveAbilitiesKey]
+        );
+      }
+    });
+
+    // Calculate promissory
+    const selectedPromissoryNoteKeys = Object.keys(
+      selectedPromissoryNotes
+    ) as PromissoryNotes[];
+
+    selectedPromissoryNoteKeys.forEach((promissoryNoteKey) => {
+      if (selectedPromissoryNotes[promissoryNoteKey]) {
+        runCombatEvalFunc(PROMISSORY_NOTE_COMBAT[promissoryNoteKey]);
       }
     });
 
@@ -493,13 +541,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     agendaCardKeys.forEach((agendaCardKey) => {
       if (selectedAgendas[agendaCardKey]) {
-        const modCombat = AGENDA_COMBAT[agendaCardKey](
-          _unitCombat,
-          localNumUnits
-        );
-        if (modCombat) {
-          _unitCombat = deepmerge(_unitCombat, modCombat);
-        }
+        runCombatEvalFunc(AGENDA_COMBAT[agendaCardKey]);
       }
     });
 
@@ -510,29 +552,26 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       (flagshipSelectable && flagshipSelected) ||
       (!flagshipSelectable && localNumUnits.Flagship > 0)
     ) {
-      const modCombat = FACTION_FLAGSHIPS[faction]?.combatFunc?.(
-        _unitCombat,
-        numUnits
-      );
-      if (modCombat) {
-        _unitCombat = deepmerge(_unitCombat, modCombat);
-      }
+      runCombatEvalFunc(FACTION_FLAGSHIPS[faction]);
     }
 
-    return _unitCombat;
+    return {
+      unitCombat: _unitCombat,
+      additionalUnitCombat: _additionalUnitCombat,
+    };
   }, [
     initialUnitCombat,
+    valefarX,
+    valefarY,
     selectedTechnologies,
     selectedActionCards,
     selectedLeaderAbilities,
-    selectedAgendas,
     selectedFactionExclusiveAbilities,
-    valefarX,
-    valefarY,
+    selectedPromissoryNotes,
+    selectedAgendas,
     faction,
-    localNumUnits,
     flagshipSelected,
-    numUnits,
+    localNumUnits,
   ]);
 
   const rollingTimeout = useCallback(async () => {
@@ -558,68 +597,61 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
         const activeRolls: Partial<UnitRolls> = {};
 
-        const activeUnits: Units[] = UnitOrder.filter(
-          (unit) => unitCombat[unit][_combatType]?.combat !== undefined
-        );
+        const rollForCombat = (localCombat: UnitCombat) => {
+          const _activeUnits: Units[] = UnitOrder.filter(
+            (unit) => localCombat[unit][_combatType]?.combat !== undefined
+          );
 
-        activeUnits.forEach((unit) => {
-          const combatDetails = unitCombat[unit][_combatType];
-          if (localNumUnits[unit] > 0) {
-            const firstRoll = doRolls(
-              localNumUnits[unit],
-              combatDetails?.rolls,
-              combatDetails?.rollMod
-            );
+          _activeUnits.forEach((unit) => {
+            const combatDetails = localCombat[unit][_combatType];
 
-            activeRolls[unit] = [
-              {
+            let numUnits = combatDetails?.additional
+              ? combatDetails?.numUnitsMod?.[0]
+              : localNumUnits[unit];
+
+            if (
+              numUnits !== undefined &&
+              numUnits > 0 &&
+              combatDetails?.combat
+            ) {
+              const firstRoll = doRolls(
+                numUnits,
+                combatDetails?.rolls,
+                combatDetails?.rollMod
+              );
+              if (!activeRolls[unit]) {
+                activeRolls[unit] = [];
+              }
+
+              activeRolls[unit]?.push({
                 combat: combatDetails?.combat,
                 rolls: firstRoll,
                 ...(combatDetails?.rerollMisses && {
                   rerolls:
                     combatDetails?.rerollMisses &&
                     doRolls(
-                      localNumUnits[unit],
+                      numUnits,
                       combatDetails?.rolls,
                       combatDetails?.rollMod
                     ),
                 }),
-              },
-            ];
-          }
+              });
+            }
+          });
+        };
 
-          // Additional Rolls
-          if (combatDetails?.additional) {
-            combatDetails.additional?.forEach((additionalCombat) => {
-              if (additionalCombat.combat) {
-                if (!activeRolls[unit]) {
-                  activeRolls[unit] = [];
-                }
-                const extraUnits = additionalCombat?.numUnitsMod?.reduce(
-                  (partialSum, a) => partialSum + a,
-                  0
-                );
-                activeRolls[unit]?.push({
-                  combat: additionalCombat.combat,
-                  rolls: doRolls(
-                    localNumUnits[unit] + (extraUnits || 0),
-                    additionalCombat.rolls,
-                    additionalCombat.rollMod
-                  ),
-                });
-              }
-            });
-          }
-        });
+        rollForCombat(unitCombat);
+        rollForCombat(additionalUnitCombat);
 
         setRolls(activeRolls);
       };
     },
-    [localNumUnits, unitCombat, rolling, rollingTimeout]
+    [localNumUnits, unitCombat, additionalUnitCombat, rolling, rollingTimeout]
   );
 
   const rollHits = useMemo(() => {
     const activeRolls = Object.keys(rolls) as Units[];
+
     return activeRolls.reduce((acc, activeUnit) => {
       const rollhits = rolls[activeUnit]?.map((unitRolls) => {
         const combatStrength: number = combatType ? unitRolls.combat || 1 : 0;
@@ -706,6 +738,27 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     setRolls(newRolls);
   }, [rolls, rollHits, rollingTimeout]);
 
+  const combinedModifiers = useMemo(() => {
+    const combinedModifiers: Record<string, boolean> = {
+      ...selectedActionCards,
+      ...selectedTechnologies,
+      ...selectedAgendas,
+      ...selectedLeaderAbilities,
+      ...selectedPromissoryNotes,
+      ...selectedFactionExclusiveAbilities,
+    };
+    return Object.keys(combinedModifiers).filter(
+      (key) => combinedModifiers[key]
+    );
+  }, [
+    selectedActionCards,
+    selectedAgendas,
+    selectedFactionExclusiveAbilities,
+    selectedPromissoryNotes,
+    selectedLeaderAbilities,
+    selectedTechnologies,
+  ]);
+
   if (!shouldShow) {
     return null;
   }
@@ -716,7 +769,14 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         <Header>
           <CloseButton onClick={onClose}>X</CloseButton>
         </Header>
-        <Accordion label="Modifiers">
+        <Accordion
+          label="Modifiers"
+          subLabel={
+            combinedModifiers.length > 0
+              ? `(${combinedModifiers.join(",")})`
+              : undefined
+          }
+        >
           <>
             <Header>
               <HeaderWrapper>
@@ -756,6 +816,17 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                       onClick={() => onActionCardSelected(actionCard)}
                     >
                       {actionCard}
+                    </SelectableButton>
+                  </HeaderButtonContainer>
+                ))}
+                {PROMISSORY_NOTES.map((note) => (
+                  <HeaderButtonContainer key={note}>
+                    <SelectableButton
+                      highlightColor="orange"
+                      selected={selectedPromissoryNotes[note]}
+                      onClick={() => onPromissoryNoteSelected(note)}
+                    >
+                      {note}
                     </SelectableButton>
                   </HeaderButtonContainer>
                 ))}

@@ -1,4 +1,17 @@
-import { UnitCombat } from "../types";
+import { UnitCombat, Units } from "../types";
+
+export const UNIT_LIST: Units[] = [
+  "Flagship",
+  "War_Sun",
+  "Dreadnought",
+  "Cruiser",
+  "Destroyer",
+  "Carrier",
+  "Fighter",
+  "PDS",
+  "Mech",
+  "Infantry",
+];
 
 export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
   Flagship: {},

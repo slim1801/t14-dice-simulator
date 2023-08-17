@@ -41,9 +41,13 @@ export interface CombatDetails {
   rollMod?: number[];
   combat?: number;
   combatMod?: number[];
-  additional?: CombatDetails[];
+  additional?: boolean;
   rerollMisses?: boolean;
   numUnitsMod?: number[];
+
+  name?: string;
+  selectable?: boolean;
+  combatFunc?: CombatEvalFunc;
 }
 
 export type CombatType =
@@ -78,15 +82,18 @@ export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
 
-export type CombatTechnology =
-  | "Antimass Deflectors"
-  | "Plasma Scoring"
-  | "Supercharge";
+export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring";
 export type CombatActionCards =
   | "Bunker"
+  | "Experimental Battlestation"
   | "Fighter Prototype"
   | "Morale Boost"
   | "Blitz";
+
+export type CombatEvalFuncState = {
+  additional?: boolean;
+  combatEvalFunc: CombatEvalFunc;
+};
 
 export type CombatEvalFunc = (
   unitCombat?: UnitCombat,
@@ -117,7 +124,10 @@ export type FactionExclusiveTechnology =
 
 export type FactionTechnologies = Record<Factions, Technology[]>;
 
-export type FactionExclusives = "Mordred" | "Ul The Progenitor";
+export type FactionExclusives =
+  | "Munitions Reserves"
+  | "Mordred"
+  | "Ul The Progenitor";
 
 export type CombatLeaderAbilities =
   | "Viscount Unlenn"
@@ -138,10 +148,30 @@ export type Flagships =
   | "Arvicon Rex"
   | "Visz El Vir";
 
-interface Flagship {
+interface Flagship extends CombatEvalFuncState {
+  name: Flagships;
+  selectable?: boolean;
+}
+
+export type FactionFlagships = Record<Factions, Flagship | null>;
+
+interface UnitSpecialModifierDetails {
   name: Flagships;
   selectable?: boolean;
   combatFunc: CombatEvalFunc;
 }
 
-export type FactionFlagships = Record<Factions, Flagship | null>;
+export type UnitSpecialModifier = Partial<
+  Record<Units, UnitSpecialModifierDetails>
+>;
+export type FactionUnitSpecialModifiers = Record<
+  Factions,
+  UnitSpecialModifier | null
+>;
+
+export type PromissoryNotes =
+  | "War Funding"
+  | "Strike Wing Ambuscade"
+  | "Tekklar Legion"
+  | "The Cavalry (Memoria)"
+  | "The Cavalry (Memoria II)";

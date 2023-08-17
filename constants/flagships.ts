@@ -12,7 +12,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   Mentak: null,
   Naalu: {
     name: "Matriarch",
-    combatFunc: (unitCombat?: UnitCombat) => {
+    combatEvalFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat?.Fighter) {
         return {
           Fighter: {
@@ -25,7 +25,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   },
   Nekro: {
     name: "The Alastor",
-    combatFunc: (unitCombat?: UnitCombat) => {
+    combatEvalFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat) {
         return {
           Mech: {
@@ -41,7 +41,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   },
   Sardakk: {
     name: "C'Morran N'orr",
-    combatFunc: (unitCombat?: UnitCombat) => {
+    combatEvalFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat) {
         return {
           War_Sun: {
@@ -84,7 +84,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   Mahact: {
     name: "Arvicon Rex",
     selectable: true,
-    combatFunc: (unitCombat?: UnitCombat) => {
+    combatEvalFunc: (unitCombat?: UnitCombat) => {
       if (unitCombat) {
         return {
           Flagship: {
@@ -139,7 +139,7 @@ export const FACTION_FLAGSHIPS: FactionFlagships = {
   },
   NaazRokha: {
     name: "Visz El Vir",
-    combatFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
+    combatEvalFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
       if (unitCombat) {
         const extraRolls = numUnits?.Mech || 0;
         return {

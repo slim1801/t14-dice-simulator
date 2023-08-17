@@ -1,12 +1,12 @@
 import {
-  CombatEvalFunc,
+  CombatEvalFuncState,
   CombatTechnology,
   FactionExclusiveTechnology,
   FactionTechnologies,
   UnitCombat,
   Units,
 } from "../types";
-import { combatModFunc, optimisedRoll } from "../utils/combat";
+import { optimisedRoll } from "../utils/combat";
 import { ALL_FACTIONS } from "./factions";
 
 export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
@@ -15,38 +15,44 @@ export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
       { name: "Antimass Deflectors", type: "Propulsion" },
       { name: "Plasma Scoring", type: "Warfare" },
     ];
-    if (faction === "NaazRokha") {
-      acc[faction].push({ name: "Supercharge", type: "Warfare" });
-    }
     return acc;
   },
   {} as FactionTechnologies
 );
 
-export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
-  "Antimass Deflectors": (unitCombat?: UnitCombat) => {
-    const moddedCombat: Partial<UnitCombat> | null = {};
-    if (unitCombat) {
-      const units = Object.keys(unitCombat) as Units[];
-      units.reduce((acc, unit) => {
-        if (unitCombat[unit].spaceCannon?.combat) {
-          acc[unit] = {
-            ...(unitCombat[unit].spaceCannon?.combat && {
-              spaceCannon: { combatMod: [-1] },
-            }),
-          };
+export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFuncState> =
+  {
+    "Antimass Deflectors": {
+      combatEvalFunc: (unitCombat?: UnitCombat) => {
+        const moddedCombat: Partial<UnitCombat> | null = {};
+        if (unitCombat) {
+          const units = Object.keys(unitCombat) as Units[];
+          units.reduce((acc, unit) => {
+            if (unitCombat[unit].spaceCannon?.combat) {
+              acc[unit] = {
+                ...(unitCombat[unit].spaceCannon?.combat && {
+                  spaceCannon: { combatMod: [-1] },
+                }),
+              };
+            }
+            return acc;
+          }, moddedCombat);
         }
-        return acc;
-      }, moddedCombat);
-    }
-    return moddedCombat;
-  },
-  "Plasma Scoring": optimisedRoll(
-    ["bombardment", "antiFighterBarrage", "spaceCannon", "groundSpaceCannon"],
-    [1]
-  ),
-  Supercharge: combatModFunc([1]),
-};
+        return moddedCombat;
+      },
+    },
+    "Plasma Scoring": {
+      combatEvalFunc: optimisedRoll(
+        [
+          "bombardment",
+          "antiFighterBarrage",
+          "spaceCannon",
+          "groundSpaceCannon",
+        ],
+        [1]
+      ),
+    },
+  };
 
 export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveTechnology[] = [
   "Spec Ops II",
