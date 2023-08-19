@@ -874,7 +874,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 <Combat
                   combat={
                     combatType
-                      ? unitCombats[index][unit][combatType]?.combat
+                      ? unitCombats[index]?.[unit]?.[combatType]?.combat
                       : undefined
                   }
                 />
