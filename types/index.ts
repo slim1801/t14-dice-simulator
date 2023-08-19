@@ -79,7 +79,8 @@ export interface UnitRoll {
 
 export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
-export type UnitCombat = Record<Units, Combat> & Record<"name", string>;
+export type UnitCombat = Record<Units, Combat> &
+  Partial<Record<"name", string>>;
 export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
