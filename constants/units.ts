@@ -13,6 +13,19 @@ export const UNIT_LIST: Units[] = [
   "Infantry",
 ];
 
+export const EMPTY_COMBAT_STRENGTH: UnitCombat = {
+  Flagship: {},
+  War_Sun: {},
+  Dreadnought: {},
+  Cruiser: {},
+  Destroyer: {},
+  Carrier: {},
+  Fighter: {},
+  PDS: {},
+  Mech: {},
+  Infantry: {},
+};
+
 export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
   Flagship: {},
   War_Sun: {},

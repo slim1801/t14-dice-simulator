@@ -15,9 +15,23 @@ import { StylelessButton } from "./StylelessButton";
 import {
   DEFAULT_UNIT_COMBAT_STRENGTH,
   DEFAULT_UNIT_UPGRADE_COMBAT,
+  EMPTY_COMBAT_STRENGTH,
 } from "../constants/units";
-import { NumUnits, UnitUpgraded, Factions, Units, UnitCombat } from "../types";
+import {
+  NumUnits,
+  UnitUpgraded,
+  Factions,
+  Units,
+  UnitCombat,
+  AdditionalCombatUnit,
+} from "../types";
 import { FactionBackgroundImage } from "./FactionBackgroundImage";
+import SelectableButton from "./SelectableButton";
+import { HeaderButtonContainer, HeaderWrapper } from "./Headers";
+import {
+  ADDITIONAL_UNIT_COMBAT,
+  FACTION_ADDITIONAL_COMBAT_UNITS,
+} from "../constants/additionalCombat";
 
 interface FactionProps {
   faction: Factions;
@@ -163,11 +177,59 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
     return initialCombat;
   }, [upgraded, factionUpgrade, faction]);
 
+  const defaultSelectedAdditionalUnits = useMemo(() => {
+    return FACTION_ADDITIONAL_COMBAT_UNITS[faction].reduce(
+      (acc, additionalCombat) => {
+        acc[additionalCombat] = false;
+        return acc;
+      },
+      {} as Record<AdditionalCombatUnit, boolean>
+    );
+  }, [faction]);
+
+  const [selectedAdditionalCombatUnit, setSelectedAdditionalCombatUnit] =
+    useState(defaultSelectedAdditionalUnits);
+
+  const onAdditionalCombatUnitSelected = useCallback(
+    (addCombat: AdditionalCombatUnit) => {
+      setSelectedAdditionalCombatUnit((prevState) => ({
+        ...prevState,
+        [addCombat]: !prevState[addCombat],
+      }));
+    },
+    []
+  );
+
+  const additionalUnitCombat: UnitCombat[] = useMemo(() => {
+    const additionalCombatUnits = Object.keys(
+      selectedAdditionalCombatUnit
+    ) as AdditionalCombatUnit[];
+
+    const combats: UnitCombat[] = [];
+
+    additionalCombatUnits.forEach((combatUnit) => {
+      if (selectedAdditionalCombatUnit[combatUnit]) {
+        const additionalCombat = ADDITIONAL_UNIT_COMBAT[combatUnit](
+          combat,
+          numUnits
+        );
+        if (additionalCombat) {
+          combats.push({
+            ...EMPTY_COMBAT_STRENGTH,
+            ...additionalCombat,
+          });
+        }
+      }
+    });
+    return combats;
+  }, [selectedAdditionalCombatUnit, combat, numUnits]);
+
   const [showCombatModal, setShowCombatModal] = useState(false);
 
   const onClear = useCallback(() => {
     setNumUnits({ ...DEFAULT_NUM_UNITS });
-  }, []);
+    setSelectedAdditionalCombatUnit(defaultSelectedAdditionalUnits);
+  }, [defaultSelectedAdditionalUnits]);
 
   return (
     <>
@@ -189,6 +251,25 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           </Link>
           <div style={{ flex: 1 }} />
           <ClearButton onClick={onClear}>Clear</ClearButton>
+        </Header>
+        <Header>
+          <HeaderWrapper>
+            {FACTION_ADDITIONAL_COMBAT_UNITS[faction].map(
+              (additionalCombat) => (
+                <HeaderButtonContainer key={additionalCombat}>
+                  <SelectableButton
+                    highlightColor="lightblue"
+                    selected={selectedAdditionalCombatUnit[additionalCombat]}
+                    onClick={() =>
+                      onAdditionalCombatUnitSelected(additionalCombat)
+                    }
+                  >
+                    {additionalCombat}
+                  </SelectableButton>
+                </HeaderButtonContainer>
+              )
+            )}
+          </HeaderWrapper>
         </Header>
         <ScrollContainer>
           <UnitRow
@@ -361,6 +442,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
       <CombatModal
         shouldShow={showCombatModal}
         unitCombat={combat}
+        additionalUnitCombat={additionalUnitCombat}
         faction={faction}
         numUnits={numUnits}
         onClose={() => setShowCombatModal(false)}

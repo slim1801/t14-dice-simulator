@@ -1,5 +1,5 @@
 import {
-  CombatEvalFuncState,
+  CombatEvalFunc,
   CombatTechnology,
   FactionExclusiveTechnology,
   FactionTechnologies,
@@ -20,39 +20,32 @@ export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
   {} as FactionTechnologies
 );
 
-export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFuncState> =
-  {
-    "Antimass Deflectors": {
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
-        const moddedCombat: Partial<UnitCombat> | null = {};
-        if (unitCombat) {
-          const units = Object.keys(unitCombat) as Units[];
-          units.reduce((acc, unit) => {
-            if (unitCombat[unit].spaceCannon?.combat) {
-              acc[unit] = {
-                ...(unitCombat[unit].spaceCannon?.combat && {
-                  spaceCannon: { combatMod: [-1] },
-                }),
-              };
-            }
-            return acc;
-          }, moddedCombat);
+export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
+  "Antimass Deflectors": (unitCombat?: UnitCombat) => {
+    const moddedCombat: Partial<UnitCombat> | null = {};
+    if (unitCombat) {
+      const units = Object.keys(unitCombat) as Units[];
+      units.reduce((acc, unit) => {
+        if (unitCombat[unit].spaceCannon?.combat) {
+          acc[unit] = {
+            ...(unitCombat[unit].spaceCannon?.combat && {
+              spaceCannon: { combatMod: [-1] },
+            }),
+            ...(unitCombat[unit].groundSpaceCannon?.combat && {
+              groundSpaceCannon: { combatMod: [-1] },
+            }),
+          };
         }
-        return moddedCombat;
-      },
-    },
-    "Plasma Scoring": {
-      combatEvalFunc: optimisedRoll(
-        [
-          "bombardment",
-          "antiFighterBarrage",
-          "spaceCannon",
-          "groundSpaceCannon",
-        ],
-        [1]
-      ),
-    },
-  };
+        return acc;
+      }, moddedCombat);
+    }
+    return moddedCombat;
+  },
+  "Plasma Scoring": optimisedRoll(
+    ["bombardment", "antiFighterBarrage", "spaceCannon", "groundSpaceCannon"],
+    [1]
+  ),
+};
 
 export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveTechnology[] = [
   "Spec Ops II",

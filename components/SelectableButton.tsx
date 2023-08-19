@@ -21,7 +21,7 @@ const SelectableButtonComponent = styled.button<SelectableButtonComponentProps>`
   color: grey;
   border: 1px solid grey;
   font-size: 12px;
-  background: none;
+  background: white;
 
   ${(props) =>
     props.selected &&

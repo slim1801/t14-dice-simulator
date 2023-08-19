@@ -1,5 +1,5 @@
 import {
-  CombatEvalFuncState,
+  CombatEvalFunc,
   FactionExclusiveAbilities,
   FactionExclusives,
   UnitCombat,
@@ -13,8 +13,6 @@ export const FACTION_EXCLUSIVE_ABILITIES: FactionExclusiveAbilities =
       acc[faction] = ["Munitions Reserves"];
     } else if (faction === "Nekro") {
       acc[faction] = ["Mordred"];
-    } else if (faction === "Titans") {
-      acc[faction] = ["Ul The Progenitor"];
     } else {
       acc[faction] = [];
     }
@@ -23,50 +21,25 @@ export const FACTION_EXCLUSIVE_ABILITIES: FactionExclusiveAbilities =
 
 export const FACTION_EXCLUSIVE_ABILITIES_COMBAT: Record<
   FactionExclusives,
-  CombatEvalFuncState
+  CombatEvalFunc
 > = {
-  Mordred: {
-    combatEvalFunc: () => {
-      return {
-        Mech: {
-          groundCombat: {
-            combatMod: [2],
-          },
+  Mordred: () => {
+    return {
+      Mech: {
+        groundCombat: {
+          combatMod: [2],
+        },
+      },
+    };
+  },
+  "Munitions Reserves": () => {
+    return UNIT_LIST.reduce((acc, val) => {
+      acc[val] = {
+        spaceCombat: {
+          rerollMisses: true,
         },
       };
-    },
-  },
-  "Munitions Reserves": {
-    combatEvalFunc: () => {
-      return UNIT_LIST.reduce((acc, val) => {
-        acc[val] = {
-          spaceCombat: {
-            rerollMisses: true,
-          },
-        };
-        return acc;
-      }, {} as Partial<UnitCombat>);
-    },
-  },
-  "Ul The Progenitor": {
-    additional: true,
-    combatEvalFunc: () => {
-      return {
-        PDS: {
-          spaceCannon: {
-            combat: 5,
-            rolls: 3,
-            numUnitsMod: [1],
-            additional: true,
-          },
-          groundSpaceCannon: {
-            combat: 5,
-            rolls: 3,
-            numUnitsMod: [1],
-            additional: true,
-          },
-        },
-      };
-    },
+      return acc;
+    }, {} as Partial<UnitCombat>);
   },
 };

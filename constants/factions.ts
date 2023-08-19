@@ -1,5 +1,5 @@
 import {
-  CombatEvalFuncState,
+  CombatEvalFunc,
   FactionUnitSpecialModifiers,
   Factions,
   NumUnits,
@@ -714,8 +714,8 @@ export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
   },
 };
 
-export const FACTION_TECH_COMBAT: Record<string, CombatEvalFuncState> = {
-  Supercharge: { combatEvalFunc: combatModFunc([1]) },
+export const FACTION_TECH_COMBAT: Record<string, CombatEvalFunc> = {
+  Supercharge: combatModFunc([1]),
 };
 
 export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {

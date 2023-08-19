@@ -66,18 +66,20 @@ export interface UnitHit {
   hit: boolean;
   roll: number;
   reroll?: number;
+  name?: string;
   combatStrength: number;
 }
 
 export interface UnitRoll {
   combat?: number;
   rolls: number[];
+  name?: string;
   rerolls?: number[];
 }
 
 export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
-export type UnitCombat = Record<Units, Combat>;
+export type UnitCombat = Record<Units, Combat> & Record<"name", string>;
 export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
@@ -85,15 +87,9 @@ export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
 export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring";
 export type CombatActionCards =
   | "Bunker"
-  | "Experimental Battlestation"
   | "Fighter Prototype"
   | "Morale Boost"
   | "Blitz";
-
-export type CombatEvalFuncState = {
-  additional?: boolean;
-  combatEvalFunc: CombatEvalFunc;
-};
 
 export type CombatEvalFunc = (
   unitCombat?: UnitCombat,
@@ -124,10 +120,7 @@ export type FactionExclusiveTechnology =
 
 export type FactionTechnologies = Record<Factions, Technology[]>;
 
-export type FactionExclusives =
-  | "Munitions Reserves"
-  | "Mordred"
-  | "Ul The Progenitor";
+export type FactionExclusives = "Munitions Reserves" | "Mordred";
 
 export type CombatLeaderAbilities =
   | "Viscount Unlenn"
@@ -148,9 +141,10 @@ export type Flagships =
   | "Arvicon Rex"
   | "Visz El Vir";
 
-interface Flagship extends CombatEvalFuncState {
+interface Flagship {
   name: Flagships;
   selectable?: boolean;
+  combatEvalFunc: CombatEvalFunc;
 }
 
 export type FactionFlagships = Record<Factions, Flagship | null>;
@@ -172,6 +166,15 @@ export type FactionUnitSpecialModifiers = Record<
 export type PromissoryNotes =
   | "War Funding"
   | "Strike Wing Ambuscade"
-  | "Tekklar Legion"
+  | "Tekklar Legion";
+
+export type AdditionalCombatUnit =
+  | "Experimental Battlestation"
+  | "Ul The Progenitor"
   | "The Cavalry (Memoria)"
   | "The Cavalry (Memoria II)";
+
+export type FactionAdditionalCombatUnits = Record<
+  Factions,
+  AdditionalCombatUnit[]
+>;
