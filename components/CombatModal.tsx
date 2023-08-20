@@ -562,11 +562,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         const activeRolls: Partial<UnitRolls> = {};
 
         const rollForCombat = (localCombat: UnitCombat) => {
-          const _activeUnits: Units[] = UnitOrder.filter(
-            (unit) => localCombat[unit][_combatType]?.combat !== undefined
-          );
-
-          _activeUnits.forEach((unit) => {
+          activeUnits.forEach((unit) => {
             const combatDetails = localCombat[unit][_combatType];
 
             let numUnits = combatDetails?.additional
@@ -602,6 +598,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                     ),
                 }),
               });
+            } else {
+              activeRolls[unit]?.push({
+                rolls: [],
+              });
             }
           });
         };
@@ -611,7 +611,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         setRolls(activeRolls);
       };
     },
-    [localNumUnits, unitCombats, rolling, rollingTimeout]
+    [rolling, rollingTimeout, unitCombats, activeUnits, localNumUnits]
   );
 
   const rollHits = useMemo(() => {
@@ -885,7 +885,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
           </>
         </Accordion>
         <Content>
-          {activeUnits.map((unit, index) => {
+          {activeUnits.map((unit) => {
             return (
               <CombatUnitRow key={unit}>
                 <IconContainer>
@@ -901,6 +901,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 />
                 <RollContainer>
                   {rollHits[unit]?.map((rollSets, index) => {
+                    if (rollSets.length === 0) {
+                      return null;
+                    }
+
                     const rollSet = rollSets.map(
                       ({ roll, hit, reroll }, _index) => {
                         const comma = _index < rollSets.length - 1 ? ", " : "";
@@ -931,6 +935,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                         );
                       }
                     );
+
                     return (
                       <RollSet key={index}>
                         [{rollSet}]

@@ -77,6 +77,6 @@ export const calculateCombat = (combatDetails?: CombatDetails) => {
       (acc, val) => acc + val,
       0
     );
-    return baseCombat - combatMod;
+    return Math.max(baseCombat - combatMod, 1);
   }
 };
