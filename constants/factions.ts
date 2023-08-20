@@ -296,13 +296,6 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combatMod: [-1],
       },
     },
-    War_Sun: {
-      spaceCombat: {
-        combat: 4,
-        rolls: 3,
-        combatMod: [-1],
-      },
-    },
     Cruiser: {
       spaceCombat: {
         combatMod: [-1],
@@ -762,7 +755,13 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   Sardakk: {
     ...FACTION_UNIT_COMBAT["Exotrireme II"],
   },
-  "Jol-Nar": {},
+  "Jol-Nar": {
+    War_Sun: {
+      spaceCombat: {
+        combatMod: [-1],
+      },
+    },
+  },
   Winnu: {},
   Xxcha: {},
   Yin: {},

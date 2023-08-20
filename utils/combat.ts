@@ -46,7 +46,7 @@ export const optimisedRoll = (
 
           if (combatDetails && numUnits && numUnits?.[unitKey] > 0) {
             const totalCombat = calculateCombat(combatDetails);
-            if (bestCombatValue > totalCombat) {
+            if (totalCombat !== undefined && bestCombatValue > totalCombat) {
               bestCombatValue = totalCombat;
               bestUnit = unitKey;
             }
@@ -69,12 +69,14 @@ export const optimisedRoll = (
   };
 };
 
-export const calculateCombat = (combatDetails: CombatDetails) => {
-  const baseCombat: number = combatDetails.combat || 0;
+export const calculateCombat = (combatDetails?: CombatDetails) => {
+  if (combatDetails) {
+    const baseCombat: number = combatDetails?.combat || 0;
 
-  const combatMod = (combatDetails.combatMod || []).reduce(
-    (acc, val) => acc + val,
-    0
-  );
-  return baseCombat - combatMod;
+    const combatMod = (combatDetails?.combatMod || []).reduce(
+      (acc, val) => acc + val,
+      0
+    );
+    return baseCombat - combatMod;
+  }
 };
