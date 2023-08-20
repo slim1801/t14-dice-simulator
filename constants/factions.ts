@@ -485,7 +485,7 @@ export const FACTION_UNIT_SPECIAL_MODIFIERs: FactionUnitSpecialModifiers = {
   Naalu: {
     Flagship: {
       name: "Matriarch",
-      combatFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (unitCombat?: UnitCombat) => {
         if (unitCombat?.Fighter) {
           return {
             Fighter: {
@@ -500,7 +500,7 @@ export const FACTION_UNIT_SPECIAL_MODIFIERs: FactionUnitSpecialModifiers = {
   Nekro: {
     Flagship: {
       name: "The Alastor",
-      combatFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (unitCombat?: UnitCombat) => {
         if (unitCombat) {
           return {
             Mech: {
@@ -518,7 +518,7 @@ export const FACTION_UNIT_SPECIAL_MODIFIERs: FactionUnitSpecialModifiers = {
   Sardakk: {
     Flagship: {
       name: "C'Morran N'orr",
-      combatFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (unitCombat?: UnitCombat) => {
         if (unitCombat) {
           return {
             War_Sun: {
@@ -563,7 +563,7 @@ export const FACTION_UNIT_SPECIAL_MODIFIERs: FactionUnitSpecialModifiers = {
     Flagship: {
       name: "Arvicon Rex",
       selectable: true,
-      combatFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (unitCombat?: UnitCombat) => {
         if (unitCombat) {
           return {
             Flagship: {
@@ -620,7 +620,7 @@ export const FACTION_UNIT_SPECIAL_MODIFIERs: FactionUnitSpecialModifiers = {
   NaazRokha: {
     Flagship: {
       name: "Visz El Vir",
-      combatFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
+      combatEvalFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
         if (unitCombat) {
           const extraRolls = numUnits?.Mech || 0;
           return {

@@ -388,7 +388,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           </UnitRow>
           <UnitRow
             rolls={combat.PDS.spaceCannon?.rolls}
-            combat={calculateCombat(combat.PDS.spaceCombat)}
+            combat={calculateCombat(combat.PDS.spaceCannon)}
             limit={6}
             numUnits={numUnits.PDS}
             setNumUnits={_setNumUnits("PDS")}
@@ -404,7 +404,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           </UnitRow>
           <UnitRow
             rolls={combat.Mech.groundCombat?.rolls}
-            combat={calculateCombat(combat.Mech.spaceCombat)}
+            combat={calculateCombat(combat.Mech.groundCombat)}
             limit={4}
             numUnits={numUnits.Mech}
             setNumUnits={_setNumUnits("Mech")}
@@ -420,7 +420,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           </UnitRow>
           <UnitRow
             rolls={combat.Infantry.groundCombat?.rolls}
-            combat={calculateCombat(combat.Infantry.spaceCombat)}
+            combat={calculateCombat(combat.Infantry.groundCombat)}
             numUnits={numUnits.Infantry}
             setNumUnits={_setNumUnits("Infantry")}
           >

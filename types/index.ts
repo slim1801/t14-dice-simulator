@@ -47,7 +47,7 @@ export interface CombatDetails {
 
   name?: string;
   selectable?: boolean;
-  combatFunc?: CombatEvalFunc;
+  combatEvalFunc?: CombatEvalFunc;
 }
 
 export type CombatType =
@@ -81,6 +81,10 @@ export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
 export type UnitCombat = Record<Units, Combat> &
   Partial<Record<"name", string>>;
+export type UnitCombatAbilities = Record<
+  Factions,
+  Partial<Record<Units, CombatDetails>> | null
+>;
 export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
@@ -153,7 +157,7 @@ export type FactionFlagships = Record<Factions, Flagship | null>;
 interface UnitSpecialModifierDetails {
   name: Flagships;
   selectable?: boolean;
-  combatFunc: CombatEvalFunc;
+  combatEvalFunc: CombatEvalFunc;
 }
 
 export type UnitSpecialModifier = Partial<

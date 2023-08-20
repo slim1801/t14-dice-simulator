@@ -35,7 +35,8 @@ import {
 import SelectableButton from "./SelectableButton";
 import { Header, HeaderButtonContainer, HeaderWrapper } from "./Headers";
 import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
-import { FACTION_FLAGSHIPS } from "../constants/flagships";
+// import { FACTION_FLAGSHIPS } from "../constants/flagships";
+import { UNIT_COMBAT_ABILITIES } from "../constants/units";
 import {
   FACTION_EXCLUSIVE_ABILITIES,
   FACTION_EXCLUSIVE_ABILITIES_COMBAT,
@@ -50,6 +51,7 @@ import {
   PROMISSORY_NOTES,
   PROMISSORY_NOTE_COMBAT,
 } from "../constants/promissory";
+import { calculateCombat } from "../utils/combat";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -263,7 +265,9 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   onClose,
 }) => {
   const [localNumUnits, setLocalNumUnits] = useState({ ...numUnits });
-  const [flagshipSelected, setFlagshipSelected] = useState(false);
+  const [unitAbilitySelected, setUnitAbilitySelected] = useState<
+    Partial<Record<Units, boolean>>
+  >({});
 
   useEffect(() => {
     setLocalNumUnits(numUnits);
@@ -493,14 +497,21 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         }
       });
 
-      const flagshipSelectable = FACTION_FLAGSHIPS[faction]?.selectable;
+      const unitCombatAbilities = UNIT_COMBAT_ABILITIES[faction];
 
-      // Calculate flagships
-      if (
-        (flagshipSelectable && flagshipSelected) ||
-        (!flagshipSelectable && localNumUnits.Flagship > 0)
-      ) {
-        runCombatEvalFunc(FACTION_FLAGSHIPS[faction]?.combatEvalFunc);
+      if (unitCombatAbilities) {
+        const units = Object.keys(unitCombatAbilities) as Units[];
+
+        units.forEach((unit) => {
+          const unitCombatSelectable = unitCombatAbilities[unit]?.selectable;
+          // Calculate unit combat ability
+          if (
+            (unitCombatSelectable && unitAbilitySelected[unit]) ||
+            (!unitCombatSelectable && localNumUnits[unit] > 0)
+          ) {
+            runCombatEvalFunc(unitCombatAbilities[unit]?.combatEvalFunc);
+          }
+        });
       }
 
       return _unitCombat;
@@ -523,7 +534,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     selectedPromissoryNotes,
     selectedAgendas,
     faction,
-    flagshipSelected,
+    unitAbilitySelected,
     localNumUnits,
   ]);
 
@@ -608,27 +619,22 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
     return activeRolls.reduce((acc, activeUnit) => {
       const rollhits = rolls[activeUnit]?.map((unitRolls, rollIndex) => {
-        const combatStrength: number = combatType ? unitRolls.combat || 1 : 0;
-
-        const combatMod = (
-          combatType
-            ? unitCombats[rollIndex]?.[activeUnit]?.[combatType]?.combatMod || [
-                0,
-              ]
-            : [0]
-        ).reduce((acc, val) => acc + val, 0);
+        const combatStrength: number = combatType
+          ? calculateCombat(
+              unitCombats[rollIndex]?.[activeUnit]?.[combatType]
+            ) || 1
+          : 0;
 
         return unitRolls.rolls.map((roll, index) => {
           const reroll = unitRolls.rerolls?.[index];
 
-          const initialHit = roll + combatMod >= combatStrength;
-          const rerollHit =
-            reroll !== undefined && reroll + combatMod >= combatStrength;
+          const initialHit = roll >= combatStrength;
+          const rerollHit = reroll !== undefined && reroll >= combatStrength;
           return {
             hit: initialHit || rerollHit,
             roll,
             ...(!initialHit && { reroll }),
-            combatStrength: combatStrength - combatMod,
+            combatStrength,
             name: unitRolls?.name,
           };
         });
@@ -715,6 +721,13 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     selectedLeaderAbilities,
     selectedTechnologies,
   ]);
+
+  const unitCombatAbilities = useMemo(() => {
+    const factionUnitAbilities = UNIT_COMBAT_ABILITIES[faction];
+    if (factionUnitAbilities) {
+      return Object.keys(factionUnitAbilities) as Units[];
+    }
+  }, [faction]);
 
   if (!shouldShow) {
     return null;
@@ -815,17 +828,25 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                     </SelectableButton>
                   </HeaderButtonContainer>
                 ))}
-                {localNumUnits.Flagship > 0 &&
-                  FACTION_FLAGSHIPS[faction]?.selectable && (
-                    <HeaderButtonContainer>
-                      <SelectableButton
-                        highlightColor="purple"
-                        selected={flagshipSelected}
-                        onClick={() => setFlagshipSelected(!flagshipSelected)}
-                      >
-                        {FACTION_FLAGSHIPS[faction]?.name}
-                      </SelectableButton>
-                    </HeaderButtonContainer>
+                {unitCombatAbilities &&
+                  unitCombatAbilities.map(
+                    (unit) =>
+                      UNIT_COMBAT_ABILITIES[faction]?.[unit]?.selectable && (
+                        <HeaderButtonContainer>
+                          <SelectableButton
+                            highlightColor="purple"
+                            selected={!!unitAbilitySelected[unit]}
+                            onClick={() =>
+                              setUnitAbilitySelected((prevState) => ({
+                                ...prevState,
+                                [unit]: !prevState[unit],
+                              }))
+                            }
+                          >
+                            {UNIT_COMBAT_ABILITIES[faction]?.[unit]?.name}
+                          </SelectableButton>
+                        </HeaderButtonContainer>
+                      )
                   )}
               </HeaderWrapper>
             </Header>
@@ -874,7 +895,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 <Combat
                   combat={
                     combatType
-                      ? unitCombats[0]?.[unit]?.[combatType]?.combat
+                      ? calculateCombat(unitCombats[0]?.[unit]?.[combatType])
                       : undefined
                   }
                 />
