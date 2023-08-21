@@ -568,6 +568,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
               ? combatDetails?.numUnitsMod?.[0]
               : localNumUnits[unit];
 
+            if (!activeRolls[unit]) {
+              activeRolls[unit] = [];
+            }
+
             if (
               numUnits !== undefined &&
               numUnits > 0 &&
@@ -578,10 +582,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 combatDetails?.rolls,
                 combatDetails?.rollMod
               );
-
-              if (!activeRolls[unit]) {
-                activeRolls[unit] = [];
-              }
 
               activeRolls[unit]?.push({
                 combat: combatDetails?.combat,
@@ -644,6 +644,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       return acc;
     }, {} as UnitHits);
   }, [combatType, rolls, unitCombats]);
+
+  console.log(unitCombats);
+  console.log(rolls);
+  console.log(rollHits);
 
   const totalUnitHits = useMemo(() => {
     const units = Object.keys(rollHits) as Units[];
@@ -939,8 +943,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                       <RollSet key={index}>
                         [{rollSet}]
                         <CombatStrength>
-                          {rollSets[0]?.combatStrength || 1}{" "}
-                          {rollSets[0]?.name && `(${rollSets[0]?.name})`}
+                          {rollSets[index]?.combatStrength || 1}{" "}
+                          {rollSets[index]?.name && `(${rollSets[0]?.name})`}
                         </CombatStrength>
                       </RollSet>
                     );
