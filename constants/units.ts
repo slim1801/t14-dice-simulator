@@ -190,6 +190,13 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
       combatEvalFunc: (unitCombat?: UnitCombat) => {
         if (unitCombat) {
           return {
+            ...(unitCombat.Flagship.name !== "C'Morran N'orr" && {
+              Flagship: {
+                spaceCombat: {
+                  combatMod: [1],
+                },
+              },
+            }),
             War_Sun: {
               spaceCombat: {
                 combatMod: [1],

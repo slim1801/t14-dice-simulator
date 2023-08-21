@@ -24,8 +24,8 @@ export const ADDITIONAL_UNIT_COMBAT: Record<
 > = {
   "Experimental Battlestation": () => {
     return {
-      name: "Experimental Battlestation",
       PDS: {
+        name: "Experimental Battlestation",
         spaceCannon: {
           combat: 5,
           rolls: 3,
@@ -43,8 +43,8 @@ export const ADDITIONAL_UNIT_COMBAT: Record<
   },
   "The Cavalry (Memoria)": () => {
     return {
-      name: "Memoria",
       Flagship: {
+        name: "Memoria",
         spaceCombat: {
           rolls: 2,
           combat: 7,
@@ -62,8 +62,8 @@ export const ADDITIONAL_UNIT_COMBAT: Record<
   },
   "The Cavalry (Memoria II)": () => {
     return {
-      name: "Memoria II",
       Flagship: {
+        name: "Memoria II",
         spaceCombat: {
           rolls: 2,
           combat: 5,
@@ -81,8 +81,8 @@ export const ADDITIONAL_UNIT_COMBAT: Record<
   },
   "Ul The Progenitor": () => {
     return {
-      name: "Ul The Progenitor",
       PDS: {
+        name: "Ul The Progenitor",
         spaceCannon: {
           combat: 5,
           rolls: 3,

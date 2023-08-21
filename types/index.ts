@@ -60,7 +60,7 @@ export type CombatType =
 
 export type Combat = {
   [key in CombatType]?: CombatDetails;
-};
+} & { name?: string };
 
 export interface UnitHit {
   hit: boolean;
@@ -79,8 +79,7 @@ export interface UnitRoll {
 
 export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
-export type UnitCombat = Record<Units, Combat> &
-  Partial<Record<"name", string>>;
+export type UnitCombat = Record<Units, Combat>;
 export type UnitCombatAbilities = Record<
   Factions,
   Partial<Record<Units, CombatDetails>> | null

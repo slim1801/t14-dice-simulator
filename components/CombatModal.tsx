@@ -35,7 +35,6 @@ import {
 import SelectableButton from "./SelectableButton";
 import { Header, HeaderButtonContainer, HeaderWrapper } from "./Headers";
 import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
-// import { FACTION_FLAGSHIPS } from "../constants/flagships";
 import { UNIT_COMBAT_ABILITIES } from "../constants/units";
 import {
   FACTION_EXCLUSIVE_ABILITIES,
@@ -587,7 +586,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
               activeRolls[unit]?.push({
                 combat: combatDetails?.combat,
                 rolls: firstRoll,
-                name: localCombat.name,
+                name: localCombat[unit].name,
                 ...(combatDetails?.rerollMisses && {
                   rerolls:
                     combatDetails?.rerollMisses &&
