@@ -645,10 +645,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     }, {} as UnitHits);
   }, [combatType, rolls, unitCombats]);
 
-  console.log(unitCombats);
-  console.log(rolls);
-  console.log(rollHits);
-
   const totalUnitHits = useMemo(() => {
     const units = Object.keys(rollHits) as Units[];
     return units.reduce((acc, unit) => {
