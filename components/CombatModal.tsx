@@ -16,6 +16,7 @@ import {
   FactionExclusives,
   PromissoryNotes,
   CombatEvalFunc,
+  UnitCombatDetailsList,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -54,8 +55,7 @@ import { calculateCombat } from "../utils/combat";
 
 interface CombatModalProps {
   shouldShow: boolean;
-  unitCombat: UnitCombat;
-  additionalUnitCombat: UnitCombat[];
+  unitCombatList: UnitCombatDetailsList;
   numUnits: NumUnits;
   faction: Factions;
   onClose?: () => void;
@@ -257,8 +257,7 @@ const ROLLING_TIMEOUT = 150;
 
 const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   shouldShow,
-  unitCombat: initialUnitCombat,
-  additionalUnitCombat,
+  unitCombatList,
   faction,
   numUnits,
   onClose,
@@ -385,27 +384,34 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   }, []);
 
   const activeUnits = useMemo(() => {
-    return UnitOrder.filter((unit) => {
-      const hasAdditionalCombat = additionalUnitCombat.some(
-        (additionalUnit) => Object.keys(additionalUnit[unit]).length > 0
-      );
-      return hasAdditionalCombat || numUnits[unit] > 0;
-    });
-  }, [numUnits, additionalUnitCombat]);
+    const allActiveUnits: Units[][] = [];
 
-  const [rolls, setRolls] = useState<Partial<UnitRolls>>({});
+    unitCombatList.forEach((unitCombat) => {
+      allActiveUnits.push(
+        UnitOrder.filter((unit) => {
+          return unitCombat.numUnits[unit] > 0;
+        })
+      );
+    });
+
+    return allActiveUnits;
+  }, [unitCombatList]);
+
+  const [rolls, setRolls] = useState<Partial<UnitRolls>[]>([]);
 
   const [combatType, setCombatType] = useState<CombatType | null>(null);
 
   const [rolling, setRolling] = useState(0);
 
   const unitCombats = useMemo(() => {
-    const evaluateUnitCombat = (localCombat: UnitCombat) => {
+    const allUnitCombats = unitCombatList.map(({ unitCombat }) => unitCombat);
+
+    const evaluateUnitCombat = (localCombat: UnitCombat, index: number) => {
       let _unitCombat: UnitCombat = JSON.parse(JSON.stringify(localCombat));
 
       const runCombatEvalFunc = (combatEvalFunc?: CombatEvalFunc | null) => {
         if (combatEvalFunc) {
-          const modCombat = combatEvalFunc(_unitCombat, localNumUnits);
+          const modCombat = combatEvalFunc(allUnitCombats, index, numUnits);
           if (modCombat) {
             _unitCombat = deepmerge(_unitCombat, modCombat);
           }
@@ -516,14 +522,9 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       return _unitCombat;
     };
 
-    const additionalCombats = additionalUnitCombat.map((additionalUnit) =>
-      evaluateUnitCombat(additionalUnit)
-    );
-
-    return [evaluateUnitCombat(initialUnitCombat), ...additionalCombats];
+    return allUnitCombats.map(evaluateUnitCombat);
   }, [
-    initialUnitCombat,
-    additionalUnitCombat,
+    unitCombatList,
     valefarX,
     valefarY,
     selectedTechnologies,
@@ -533,6 +534,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     selectedPromissoryNotes,
     selectedAgendas,
     faction,
+    numUnits,
     unitAbilitySelected,
     localNumUnits,
   ]);
@@ -555,21 +557,24 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         }
         setCombatType(_combatType);
 
-        setRolls({});
+        setRolls([]);
         await rollingTimeout();
 
-        const activeRolls: Partial<UnitRolls> = {};
+        const activeRolls: Partial<UnitRolls>[] = [];
 
         const rollForCombat = (localCombat: UnitCombat) => {
-          activeUnits.forEach((unit) => {
+          const activeRoll: Partial<UnitRolls> = {};
+          const units = Object.keys(localCombat) as Units[];
+
+          units.forEach((unit) => {
             const combatDetails = localCombat[unit][_combatType];
 
             let numUnits = combatDetails?.additional
               ? combatDetails?.numUnitsMod?.[0]
               : localNumUnits[unit];
 
-            if (!activeRolls[unit]) {
-              activeRolls[unit] = [];
+            if (combatDetails?.combat !== undefined && !activeRoll[unit]) {
+              activeRoll[unit] = [];
             }
 
             if (
@@ -583,7 +588,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 combatDetails?.rollMod
               );
 
-              activeRolls[unit]?.push({
+              activeRoll[unit]?.push({
                 combat: combatDetails?.combat,
                 rolls: firstRoll,
                 name: localCombat[unit].name,
@@ -597,12 +602,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                     ),
                 }),
               });
-            } else {
-              activeRolls[unit]?.push({
-                rolls: [],
-              });
             }
           });
+
+          activeRolls.push(activeRoll);
         };
 
         unitCombats.forEach((unitCombat) => rollForCombat(unitCombat));
@@ -610,59 +613,71 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         setRolls(activeRolls);
       };
     },
-    [rolling, rollingTimeout, unitCombats, activeUnits, localNumUnits]
+    [rolling, rollingTimeout, unitCombats, localNumUnits]
   );
 
   const rollHits = useMemo(() => {
-    const activeRolls = Object.keys(rolls) as Units[];
+    const unitHits: UnitHits[] = [];
+    rolls.forEach((roll, unitRollIndex) => {
+      const activeRolls = Object.keys(roll) as Units[];
 
-    return activeRolls.reduce((acc, activeUnit) => {
-      const rollhits = rolls[activeUnit]?.map((unitRolls, rollIndex) => {
-        const combatStrength: number = combatType
-          ? calculateCombat(
-              unitCombats[rollIndex]?.[activeUnit]?.[combatType]
-            ) || 1
-          : 0;
+      const unitHit = activeRolls.reduce((acc, activeUnit) => {
+        const rollhits = roll[activeUnit]?.map((unitRolls, rollIndex) => {
+          const combatStrength: number = combatType
+            ? calculateCombat(
+                unitCombats[unitRollIndex]?.[activeUnit]?.[combatType]
+              ) || 1
+            : 0;
 
-        return unitRolls.rolls.map((roll, index) => {
-          const reroll = unitRolls.rerolls?.[index];
+          return unitRolls.rolls.map((rollValue, index) => {
+            const reroll = unitRolls.rerolls?.[index];
 
-          const initialHit = roll >= combatStrength;
-          const rerollHit = reroll !== undefined && reroll >= combatStrength;
-          return {
-            hit: initialHit || rerollHit,
-            roll,
-            ...(!initialHit && { reroll }),
-            combatStrength,
-            name: unitRolls?.name,
-          };
+            const initialHit = rollValue >= combatStrength;
+            const rerollHit = reroll !== undefined && reroll >= combatStrength;
+            return {
+              hit: initialHit || rerollHit,
+              roll: rollValue,
+              ...(!initialHit && { reroll }),
+              combatStrength,
+              name: unitRolls?.name,
+            };
+          });
         });
-      });
-      if (rollhits) {
-        acc[activeUnit] = rollhits;
-      }
-      return acc;
-    }, {} as UnitHits);
+        if (rollhits) {
+          acc[activeUnit] = rollhits;
+        }
+        return acc;
+      }, {} as UnitHits);
+
+      unitHits.push(unitHit);
+    });
+    return unitHits;
   }, [combatType, rolls, unitCombats]);
 
   const totalUnitHits = useMemo(() => {
-    const units = Object.keys(rollHits) as Units[];
-    return units.reduce((acc, unit) => {
-      acc[unit] = rollHits[unit]
-        .flat()
-        .reduce((acc, val) => acc + (val.hit ? 1 : 0), 0);
-      return acc;
-    }, {} as Record<Units, number>);
+    let totalUnitHitsList: Record<Units, number>[] = [];
+    rollHits.forEach((rollHit) => {
+      const units = Object.keys(rollHit) as Units[];
+      const totalHits = units.reduce((acc, unit) => {
+        acc[unit] = rollHit[unit]
+          .flat()
+          .reduce((acc, val) => acc + (val.hit ? 1 : 0), 0);
+        return acc;
+      }, {} as Record<Units, number>);
+      totalUnitHitsList.push(totalHits);
+    });
+    return totalUnitHitsList;
   }, [rollHits]);
 
   const totalHits = useMemo(() => {
-    const units = Object.keys(totalUnitHits) as Units[];
-    if (units.length > 0) {
-      return units.reduce((acc, unit) => {
-        return acc + totalUnitHits[unit];
-      }, 0);
-    }
-    return null;
+    let totalHitsSum = 0;
+    totalUnitHits.forEach((totalUnitHit) => {
+      const units = Object.keys(totalUnitHit) as Units[];
+      units.forEach((unit) => {
+        totalHitsSum += totalUnitHit[unit];
+      });
+    });
+    return totalHitsSum;
   }, [totalUnitHits]);
 
   const rollingLabel = useMemo(() => {
@@ -677,27 +692,34 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   }, [rolling]);
 
   const onReroll = useCallback(async () => {
-    const newRolls: Partial<UnitRolls> = {};
-    const units = Object.keys(rolls) as Units[];
+    const newTotalRolls: Partial<UnitRolls>[] = [];
 
-    units.forEach((unit) => {
-      newRolls[unit] = [];
-      rolls?.[unit]?.forEach((unitRolls, rollSetIndex) => {
-        const newUnitHits = unitRolls?.rolls?.map((rollValue, rollIndex) => {
-          if (!rollHits?.[unit]?.[rollSetIndex]?.[rollIndex]?.hit) {
-            return _doroll(1)[0];
-          }
-          return rollValue;
-        });
-        newRolls[unit]?.push({
-          ...unitRolls,
-          rolls: newUnitHits,
+    rolls.forEach((roll, unitRollIndex) => {
+      const newRolls: Partial<UnitRolls> = {};
+      const units = Object.keys(roll) as Units[];
+
+      units.forEach((unit) => {
+        newRolls[unit] = [];
+        roll?.[unit]?.forEach((unitRolls, rollSetIndex) => {
+          const newUnitHits = unitRolls?.rolls?.map((rollValue, rollIndex) => {
+            if (
+              !rollHits[unitRollIndex]?.[unit]?.[rollSetIndex]?.[rollIndex]?.hit
+            ) {
+              return _doroll(1)[0];
+            }
+            return rollValue;
+          });
+          newRolls[unit]?.push({
+            ...unitRolls,
+            rolls: newUnitHits,
+          });
         });
       });
+      newTotalRolls.push(newRolls);
     });
 
     await rollingTimeout();
-    setRolls(newRolls);
+    setRolls(newTotalRolls);
   }, [rolls, rollHits, rollingTimeout]);
 
   const combinedModifiers = useMemo(() => {
@@ -884,103 +906,110 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
           </>
         </Accordion>
         <Content>
-          {activeUnits.map((unit) => {
-            return (
-              <CombatUnitRow key={unit}>
-                <IconContainer>
-                  <IconImage faction={faction} unit={unit} />
-                  <NumUnitsContainer>x{localNumUnits[unit]}</NumUnitsContainer>
-                </IconContainer>
-                <Combat
-                  combat={
-                    combatType
-                      ? calculateCombat(unitCombats[0]?.[unit]?.[combatType])
-                      : undefined
-                  }
-                />
-                <RollContainer>
-                  {rollHits[unit]?.map((rollSets, index) => {
-                    if (rollSets.length === 0) {
-                      return null;
+          {activeUnits.map((activeUnit, index) => {
+            return activeUnit.map((unit) => {
+              return (
+                <CombatUnitRow key={unit}>
+                  <IconContainer>
+                    <IconImage faction={faction} unit={unit} />
+                    <NumUnitsContainer>
+                      x{localNumUnits[unit]}
+                    </NumUnitsContainer>
+                  </IconContainer>
+                  <Combat
+                    combat={
+                      combatType
+                        ? calculateCombat(
+                            unitCombats[index]?.[unit]?.[combatType]
+                          )
+                        : undefined
                     }
-
-                    const rollSet = rollSets.map(
-                      ({ roll, hit, reroll }, _index) => {
-                        const comma = _index < rollSets.length - 1 ? ", " : "";
-                        if (hit) {
-                          if (reroll !== undefined) {
-                            return (
-                              <Fragment key={_index}>
-                                <span>{`${roll}->`}</span>
-                                <DiceHit>{reroll}</DiceHit>
-                                <span>{comma}</span>
-                              </Fragment>
-                            );
-                          } else {
-                            return (
-                              <Fragment key={_index}>
-                                <DiceHit>{roll}</DiceHit>
-                                <span>{comma}</span>
-                              </Fragment>
-                            );
-                          }
-                        }
-                        return (
-                          <span key={_index}>
-                            {roll}
-                            {reroll !== undefined && `->${reroll}`}
-                            {comma}
-                          </span>
-                        );
+                  />
+                  <RollContainer>
+                    {rollHits[index]?.[unit]?.map((rollSets, index) => {
+                      if (rollSets.length === 0) {
+                        return null;
                       }
-                    );
 
-                    return (
-                      <RollSet key={index}>
-                        [{rollSet}]
-                        <CombatStrength>
-                          {rollSets[index]?.combatStrength || 1}{" "}
-                          {rollSets[index]?.name && `(${rollSets[0]?.name})`}
-                        </CombatStrength>
-                      </RollSet>
-                    );
-                  })}
-                </RollContainer>
-                <TotalUnitHitContainer>
-                  {totalUnitHits[unit]}
-                </TotalUnitHitContainer>
-                <RoundButtonContainer>
-                  <RoundButton
-                    radius={15}
-                    color="black"
-                    disabled={localNumUnits[unit] === 0}
-                    onClick={() =>
-                      setLocalNumUnits((prevState) => ({
-                        ...prevState,
-                        [unit]: prevState[unit] - 1,
-                      }))
-                    }
-                  >
-                    -
-                  </RoundButton>
-                </RoundButtonContainer>
-                <RoundButtonContainer>
-                  <RoundButton
-                    radius={15}
-                    color="black"
-                    disabled={localNumUnits[unit] === numUnits[unit]}
-                    onClick={() =>
-                      setLocalNumUnits((prevState) => ({
-                        ...prevState,
-                        [unit]: prevState[unit] + 1,
-                      }))
-                    }
-                  >
-                    +
-                  </RoundButton>
-                </RoundButtonContainer>
-              </CombatUnitRow>
-            );
+                      const rollSet = rollSets.map(
+                        ({ roll, hit, reroll }, _index) => {
+                          const comma =
+                            _index < rollSets.length - 1 ? ", " : "";
+                          if (hit) {
+                            if (reroll !== undefined) {
+                              return (
+                                <Fragment key={_index}>
+                                  <span>{`${roll}->`}</span>
+                                  <DiceHit>{reroll}</DiceHit>
+                                  <span>{comma}</span>
+                                </Fragment>
+                              );
+                            } else {
+                              return (
+                                <Fragment key={_index}>
+                                  <DiceHit>{roll}</DiceHit>
+                                  <span>{comma}</span>
+                                </Fragment>
+                              );
+                            }
+                          }
+                          return (
+                            <span key={_index}>
+                              {roll}
+                              {reroll !== undefined && `->${reroll}`}
+                              {comma}
+                            </span>
+                          );
+                        }
+                      );
+
+                      return (
+                        <RollSet key={index}>
+                          [{rollSet}]
+                          <CombatStrength>
+                            {rollSets[index]?.combatStrength || 1}{" "}
+                            {rollSets[index]?.name && `(${rollSets[0]?.name})`}
+                          </CombatStrength>
+                        </RollSet>
+                      );
+                    })}
+                  </RollContainer>
+                  <TotalUnitHitContainer>
+                    {totalUnitHits[index]?.[unit]}
+                  </TotalUnitHitContainer>
+                  <RoundButtonContainer>
+                    <RoundButton
+                      radius={15}
+                      color="black"
+                      disabled={localNumUnits[unit] === 0}
+                      onClick={() =>
+                        setLocalNumUnits((prevState) => ({
+                          ...prevState,
+                          [unit]: prevState[unit] - 1,
+                        }))
+                      }
+                    >
+                      -
+                    </RoundButton>
+                  </RoundButtonContainer>
+                  <RoundButtonContainer>
+                    <RoundButton
+                      radius={15}
+                      color="black"
+                      disabled={localNumUnits[unit] === numUnits[unit]}
+                      onClick={() =>
+                        setLocalNumUnits((prevState) => ({
+                          ...prevState,
+                          [unit]: prevState[unit] + 1,
+                        }))
+                      }
+                    >
+                      +
+                    </RoundButton>
+                  </RoundButtonContainer>
+                </CombatUnitRow>
+              );
+            });
           })}
         </Content>
         <Footer>

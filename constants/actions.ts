@@ -1,4 +1,10 @@
-import { CombatActionCards, CombatEvalFunc, UnitCombat, Units } from "../types";
+import {
+  CombatActionCards,
+  CombatEvalFunc,
+  NumUnits,
+  UnitCombat,
+  Units,
+} from "../types";
 import { combatModFunc } from "../utils/combat";
 
 export const COMBAT_ACTION_CARDS: CombatActionCards[] = [
@@ -9,7 +15,9 @@ export const COMBAT_ACTION_CARDS: CombatActionCards[] = [
 ];
 
 export const ACTION_COMBAT: Record<CombatActionCards, CombatEvalFunc> = {
-  Bunker: (unitCombat?: UnitCombat) => {
+  Bunker: (allUnitCombats?: UnitCombat[], unitCombatIndex?: number) => {
+    const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+
     const moddedCombat: Partial<UnitCombat> | null = {};
     if (unitCombat) {
       const units = Object.keys(unitCombat) as Units[];
@@ -38,7 +46,13 @@ export const ACTION_COMBAT: Record<CombatActionCards, CombatEvalFunc> = {
     return moddedCombat;
   },
   "Morale Boost": combatModFunc([1]),
-  Blitz: (unitCombat?: UnitCombat, numUnits?) => {
+  Blitz: (
+    allUnitCombats?: UnitCombat[],
+    unitCombatIndex?: number,
+    numUnits?: NumUnits
+  ) => {
+    const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+
     const moddedCombat: Partial<UnitCombat> | null = {};
     if (unitCombat) {
       const units = Object.keys(unitCombat) as Units[];

@@ -24,6 +24,7 @@ import {
   Units,
   UnitCombat,
   AdditionalCombatUnit,
+  UnitCombatDetailsList,
 } from "../types";
 import { FactionBackgroundImage } from "./FactionBackgroundImage";
 import SelectableButton from "./SelectableButton";
@@ -210,10 +211,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
 
     additionalCombatUnits.forEach((combatUnit) => {
       if (selectedAdditionalCombatUnit[combatUnit]) {
-        const additionalCombat = ADDITIONAL_UNIT_COMBAT[combatUnit](
-          combat,
-          numUnits
-        );
+        const additionalCombat = ADDITIONAL_UNIT_COMBAT[combatUnit];
         if (additionalCombat) {
           combats.push({
             ...EMPTY_COMBAT_STRENGTH,
@@ -223,7 +221,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
       }
     });
     return combats;
-  }, [selectedAdditionalCombatUnit, combat, numUnits]);
+  }, [selectedAdditionalCombatUnit]);
 
   const [showCombatModal, setShowCombatModal] = useState(false);
 
@@ -231,6 +229,43 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
     setNumUnits({ ...DEFAULT_NUM_UNITS });
     setSelectedAdditionalCombatUnit(defaultSelectedAdditionalUnits);
   }, [defaultSelectedAdditionalUnits]);
+
+  const unitCombatList = useMemo(() => {
+    const unitCombats: UnitCombatDetailsList = [
+      {
+        unitCombat: combat,
+        numUnits,
+      },
+    ];
+    const additionalCombatUnits = Object.keys(
+      selectedAdditionalCombatUnit
+    ) as AdditionalCombatUnit[];
+
+    additionalCombatUnits.forEach((combatUnit) => {
+      if (selectedAdditionalCombatUnit[combatUnit]) {
+        const additionalCombat = ADDITIONAL_UNIT_COMBAT[combatUnit];
+        if (additionalCombat) {
+          const unitCombat = {
+            ...EMPTY_COMBAT_STRENGTH,
+            ...additionalCombat,
+          };
+          const unitCombatKeys = Object.keys(unitCombat) as Units[];
+          const additionalNumUnits = unitCombatKeys.reduce((acc, unitKey) => {
+            acc[unitKey] = Object.keys(unitCombat[unitKey]).length > 0 ? 1 : 0;
+            return acc;
+          }, {} as NumUnits);
+          unitCombats.push({
+            unitCombat,
+            numUnits: additionalNumUnits,
+          });
+        }
+      }
+    });
+
+    return unitCombats;
+  }, [combat, numUnits, selectedAdditionalCombatUnit]);
+
+  console.log(unitCombatList);
 
   return (
     <>
@@ -442,8 +477,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
       </Container>
       <CombatModal
         shouldShow={showCombatModal}
-        unitCombat={combat}
-        additionalUnitCombat={additionalUnitCombat}
+        unitCombatList={unitCombatList}
         faction={faction}
         numUnits={numUnits}
         onClose={() => setShowCombatModal(false)}

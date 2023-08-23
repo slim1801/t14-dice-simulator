@@ -77,6 +77,11 @@ export interface UnitRoll {
   rerolls?: number[];
 }
 
+export interface UnitCombatDetails {
+  unitCombat: UnitCombat;
+  numUnits: NumUnits;
+}
+
 export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
 export type UnitCombat = Record<Units, Combat>;
@@ -87,6 +92,7 @@ export type UnitCombatAbilities = Record<
 export type UnitRolls = Record<Units, UnitRoll[]>;
 export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
+export type UnitCombatDetailsList = UnitCombatDetails[];
 
 export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring";
 export type CombatActionCards =
@@ -96,7 +102,8 @@ export type CombatActionCards =
   | "Blitz";
 
 export type CombatEvalFunc = (
-  unitCombat?: UnitCombat,
+  allUnitCombats?: UnitCombat[],
+  unitCombatIndex?: number,
   numUnits?: NumUnits
 ) => Partial<UnitCombat> | null;
 

@@ -154,7 +154,11 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   Naalu: {
     Flagship: {
       name: "Matriarch",
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat?.Fighter) {
           return {
             Fighter: {
@@ -169,7 +173,11 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   Nekro: {
     Flagship: {
       name: "The Alastor",
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat) {
           return {
             Mech: {
@@ -187,7 +195,11 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   Sardakk: {
     Flagship: {
       name: "C'Morran N'orr",
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat) {
           return {
             ...(unitCombat.Flagship.name !== "C'Morran N'orr" && {
@@ -230,7 +242,11 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   },
   "Jol-Nar": {
     Mech: {
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat) {
           return {
             Infantry: {
@@ -254,7 +270,11 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
     Flagship: {
       name: "Arvicon Rex",
       selectable: true,
-      combatEvalFunc: (unitCombat?: UnitCombat) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat) {
           return {
             Flagship: {
@@ -311,7 +331,12 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   NaazRokha: {
     Flagship: {
       name: "Visz El Vir",
-      combatEvalFunc: (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number,
+        numUnits?: NumUnits
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
         if (unitCombat) {
           const extraRolls = numUnits?.Mech || 0;
           return {

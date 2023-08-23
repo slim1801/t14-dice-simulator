@@ -8,8 +8,9 @@ import {
 } from "../types";
 
 export const combatModFunc = (combatMod: number[]): CombatEvalFunc => {
-  return (unitCombat?: UnitCombat) => {
+  return (allUnitCombats?: UnitCombat[], unitCombatIndex?: number) => {
     const moddedCombat: Partial<UnitCombat> | null = {};
+    const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
     if (unitCombat) {
       const units = Object.keys(unitCombat) as Units[];
       units.reduce((acc, unit) => {
@@ -32,34 +33,42 @@ export const optimisedRoll = (
   combatTypes: CombatType[],
   rollMod: number[]
 ): CombatEvalFunc => {
-  return (unitCombat?: UnitCombat, numUnits?: NumUnits) => {
+  return (
+    allUnitCombats?: UnitCombat[],
+    unitCombatIndex?: number,
+    numUnits?: NumUnits
+  ) => {
     let bestCombat: Partial<UnitCombat> | null = {};
-    if (unitCombat) {
+    if (unitCombatIndex !== undefined && allUnitCombats?.[unitCombatIndex]) {
       combatTypes.forEach((combatType) => {
         let bestUnit: Units | undefined = undefined;
+        let bestUnitIndex: number | undefined = undefined;
         let bestCombatValue: number = Infinity;
 
-        const units = Object.keys(unitCombat) as Units[];
-        units.forEach((unitKey) => {
-          const _unitCombat = unitCombat[unitKey];
-          const combatDetails = _unitCombat?.[combatType];
+        allUnitCombats?.forEach((allUnitCombat, index) => {
+          const units = Object.keys(allUnitCombat) as Units[];
 
-          if (combatDetails && numUnits && numUnits?.[unitKey] > 0) {
-            const totalCombat = calculateCombat(combatDetails);
-            if (totalCombat !== undefined && bestCombatValue > totalCombat) {
-              bestCombatValue = totalCombat;
-              bestUnit = unitKey;
+          units.forEach((unitKey) => {
+            const _unitCombat = allUnitCombat[unitKey];
+            const combatDetails = _unitCombat?.[combatType];
+
+            if (combatDetails && numUnits && numUnits?.[unitKey] > 0) {
+              const totalCombat = calculateCombat(combatDetails);
+              if (totalCombat !== undefined && bestCombatValue > totalCombat) {
+                bestCombatValue = totalCombat;
+                bestUnit = unitKey;
+                bestUnitIndex = index;
+              }
             }
-          }
+          });
         });
-        if (bestUnit) {
+
+        if (bestUnit && bestUnitIndex === unitCombatIndex) {
           bestCombat = {
             ...bestCombat,
             [bestUnit]: {
               ...(bestCombat?.[bestUnit] || {}),
-              [combatType]: {
-                rollMod,
-              },
+              [combatType]: { rollMod },
             },
           };
         }
