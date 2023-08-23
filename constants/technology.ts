@@ -21,8 +21,13 @@ export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
 );
 
 export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
-  "Antimass Deflectors": (unitCombat?: UnitCombat) => {
+  "Antimass Deflectors": (
+    allUnitCombats?: UnitCombat[],
+    unitCombatIndex?: number
+  ) => {
+    const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
     const moddedCombat: Partial<UnitCombat> | null = {};
+
     if (unitCombat) {
       const units = Object.keys(unitCombat) as Units[];
       units.reduce((acc, unit) => {
