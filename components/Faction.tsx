@@ -265,8 +265,6 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
     return unitCombats;
   }, [combat, numUnits, selectedAdditionalCombatUnit]);
 
-  console.log(unitCombatList);
-
   return (
     <>
       <Container faction={faction}>

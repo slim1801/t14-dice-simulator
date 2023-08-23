@@ -411,7 +411,9 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
       const runCombatEvalFunc = (combatEvalFunc?: CombatEvalFunc | null) => {
         if (combatEvalFunc) {
-          const modCombat = combatEvalFunc(allUnitCombats, index, numUnits);
+          const modifiedCombats = [...allUnitCombats];
+          modifiedCombats[index] = _unitCombat;
+          const modCombat = combatEvalFunc(modifiedCombats, index, numUnits);
           if (modCombat) {
             _unitCombat = deepmerge(_unitCombat, modCombat);
           }
