@@ -1,5 +1,6 @@
 import {
   CombatEvalFunc,
+  CombatTechnology,
   FactionUnitSpecialModifiers,
   Factions,
   NumUnits,
@@ -290,6 +291,14 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combat: 6,
         rolls: 2,
         combatMod: [-1],
+        additionalHitsFunc: (roll?: number, reroll?: number) => {
+          if (
+            (roll !== undefined && roll >= 9) ||
+            (reroll !== undefined && reroll >= 9)
+          ) {
+            return 2;
+          }
+        },
       },
     },
     Cruiser: {
@@ -613,7 +622,44 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       groundSpaceCannon: {
         combat: 5,
       },
+      groundCombat: {
+        combat: 6,
+      },
     },
   },
   Cabal: {},
+};
+
+export const FACTION_STARTING_TECHNOLOGY: Partial<
+  Record<Factions, Partial<Record<CombatTechnology, boolean>>>
+> = {
+  Argent: {
+    "Plasma Scoring": true,
+  },
+  Barony: {
+    "Antimass Deflectors": true,
+    "Plasma Scoring": true,
+  },
+  "Jol-Nar": {
+    "Antimass Deflectors": true,
+    "Plasma Scoring": true,
+  },
+  L1Z1X: {
+    "Plasma Scoring": true,
+  },
+  Mentak: {
+    "Plasma Scoring": true,
+  },
+  Muaat: {
+    "Plasma Scoring": true,
+  },
+  Saar: {
+    "Antimass Deflectors": true,
+  },
+  Sol: {
+    "Antimass Deflectors": true,
+  },
+  Titans: {
+    "Antimass Deflectors": true,
+  },
 };

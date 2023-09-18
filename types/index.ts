@@ -48,6 +48,7 @@ export interface CombatDetails {
   name?: string;
   selectable?: boolean;
   combatEvalFunc?: CombatEvalFunc;
+  additionalHitsFunc?: AdditionalCombatFunc;
 }
 
 export type CombatType =
@@ -68,6 +69,7 @@ export interface UnitHit {
   reroll?: number;
   name?: string;
   combatStrength: number;
+  additionalHits?: number;
 }
 
 export interface UnitRoll {
@@ -106,6 +108,11 @@ export type CombatEvalFunc = (
   unitCombatIndex?: number,
   numUnits?: NumUnits
 ) => Partial<UnitCombat> | null;
+
+export type AdditionalCombatFunc = (
+  roll?: number,
+  reroll?: number
+) => number | undefined;
 
 export type TechnologyType = "Biotic" | "Propulsion" | "Cybernetic" | "Warfare";
 

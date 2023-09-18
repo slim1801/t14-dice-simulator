@@ -79,8 +79,8 @@ export const optimisedRoll = (
 };
 
 export const calculateCombat = (combatDetails?: CombatDetails) => {
-  if (combatDetails) {
-    const baseCombat: number = combatDetails?.combat || 0;
+  if (combatDetails?.combat !== undefined) {
+    const baseCombat: number = combatDetails.combat;
 
     const combatMod = (combatDetails?.combatMod || []).reduce(
       (acc, val) => acc + val,

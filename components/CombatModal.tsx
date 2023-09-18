@@ -43,6 +43,7 @@ import {
 } from "../constants/factionAbilities";
 import SelectBox from "./SelectBox";
 import {
+  FACTION_STARTING_TECHNOLOGY,
   FACTION_TECH_COMBAT,
   FACTION_UNIT_COMBAT,
 } from "../constants/factions";
@@ -273,7 +274,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
 
   const defaultSelectedTechs = useMemo(() => {
     return FACTION_TECHNOLOGY[faction].reduce((acc, tech) => {
-      acc[tech.name] = false;
+      acc[tech.name] = !!FACTION_STARTING_TECHNOLOGY[faction]?.[tech.name];
       return acc;
     }, {} as Record<CombatTechnology, boolean>);
   }, [faction]);
@@ -407,7 +408,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     const allUnitCombats = unitCombatList.map(({ unitCombat }) => unitCombat);
 
     const evaluateUnitCombat = (localCombat: UnitCombat, index: number) => {
-      let _unitCombat: UnitCombat = JSON.parse(JSON.stringify(localCombat));
+      let _unitCombat: UnitCombat = localCombat;
 
       const runCombatEvalFunc = (combatEvalFunc?: CombatEvalFunc | null) => {
         if (combatEvalFunc) {
@@ -624,12 +625,16 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       const activeRolls = Object.keys(roll) as Units[];
 
       const unitHit = activeRolls.reduce((acc, activeUnit) => {
-        const rollhits = roll[activeUnit]?.map((unitRolls, rollIndex) => {
+        const rollhits = roll[activeUnit]?.map((unitRolls) => {
           const combatStrength: number = combatType
             ? calculateCombat(
                 unitCombats[unitRollIndex]?.[activeUnit]?.[combatType]
               ) || 1
             : 0;
+
+          const unitCombat = combatType
+            ? unitCombats[unitRollIndex][activeUnit]?.[combatType]
+            : undefined;
 
           return unitRolls.rolls.map((rollValue, index) => {
             const reroll = unitRolls.rerolls?.[index];
@@ -642,6 +647,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
               ...(!initialHit && { reroll }),
               combatStrength,
               name: unitRolls?.name,
+              additionalHits: unitCombat?.additionalHitsFunc?.(
+                rollValue,
+                reroll
+              ),
             };
           });
         });
@@ -663,13 +672,19 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       const totalHits = units.reduce((acc, unit) => {
         acc[unit] = rollHit[unit]
           .flat()
-          .reduce((acc, val) => acc + (val.hit ? 1 : 0), 0);
+          .reduce(
+            (acc, val) => acc + (val.hit ? 1 : 0) + (val.additionalHits || 0),
+            0
+          );
+
         return acc;
       }, {} as Record<Units, number>);
       totalUnitHitsList.push(totalHits);
     });
     return totalUnitHitsList;
   }, [rollHits]);
+
+  console.log(rollHits);
 
   const totalHits = useMemo(() => {
     let totalHitsSum = 0;
@@ -934,22 +949,34 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                       }
 
                       const rollSet = rollSets.map(
-                        ({ roll, hit, reroll }, _index) => {
+                        ({ roll, hit, reroll, additionalHits }, _index) => {
                           const comma =
                             _index < rollSets.length - 1 ? ", " : "";
+
+                          const AdditionalHitComponent =
+                            additionalHits !== undefined ? (
+                              <span> + {additionalHits}</span>
+                            ) : null;
+
                           if (hit) {
                             if (reroll !== undefined) {
                               return (
                                 <Fragment key={_index}>
                                   <span>{`${roll}->`}</span>
-                                  <DiceHit>{reroll}</DiceHit>
+                                  <DiceHit>
+                                    {reroll}
+                                    {AdditionalHitComponent}
+                                  </DiceHit>
                                   <span>{comma}</span>
                                 </Fragment>
                               );
                             } else {
                               return (
                                 <Fragment key={_index}>
-                                  <DiceHit>{roll}</DiceHit>
+                                  <DiceHit>
+                                    {roll}
+                                    {AdditionalHitComponent}
+                                  </DiceHit>
                                   <span>{comma}</span>
                                 </Fragment>
                               );
@@ -959,6 +986,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                             <span key={_index}>
                               {roll}
                               {reroll !== undefined && `->${reroll}`}
+                              {AdditionalHitComponent}
                               {comma}
                             </span>
                           );
