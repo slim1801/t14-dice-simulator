@@ -684,8 +684,6 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     return totalUnitHitsList;
   }, [rollHits]);
 
-  console.log(rollHits);
-
   const totalHits = useMemo(() => {
     let totalHitsSum = 0;
     totalUnitHits.forEach((totalUnitHit) => {

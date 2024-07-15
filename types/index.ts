@@ -1,3 +1,5 @@
+import { DiscordantStarsFactions } from "./discordantStars";
+
 export type Units =
   | "Flagship"
   | "War_Sun"
@@ -7,10 +9,11 @@ export type Units =
   | "Carrier"
   | "Fighter"
   | "PDS"
+  | "Space_Dock"
   | "Mech"
   | "Infantry";
 
-export type Factions =
+export type BasePokFactions =
   | "Arborec"
   | "Argent"
   | "Barony"
@@ -35,6 +38,8 @@ export type Factions =
   | "Xxcha"
   | "Yin"
   | "Yssaril";
+
+export type Factions = BasePokFactions | DiscordantStarsFactions;
 
 export interface CombatDetails {
   rolls?: number;

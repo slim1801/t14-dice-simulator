@@ -1,14 +1,14 @@
 import {
+  BasePokFactions,
   CombatEvalFunc,
   CombatTechnology,
-  FactionUnitSpecialModifiers,
   Factions,
-  NumUnits,
   UnitCombat,
 } from "../types";
 import { combatModFunc } from "../utils/combat";
+import { ALL_DISCORDANT_FACTIONS } from "./discordantStars/factions";
 
-export const ALL_FACTIONS: Factions[] = [
+export const BASE_POK_FACTIONS: BasePokFactions[] = [
   "Arborec",
   "Argent",
   "Barony",
@@ -33,6 +33,11 @@ export const ALL_FACTIONS: Factions[] = [
   "Xxcha",
   "Yin",
   "Yssaril",
+];
+
+export const ALL_FACTIONS: Factions[] = [
+  ...ALL_DISCORDANT_FACTIONS,
+  ...BASE_POK_FACTIONS,
 ];
 
 type FactionType = {
@@ -64,30 +69,65 @@ export const FACTION_NAMES: FactionType = {
   Nomad: "The Nomad",
   Titans: "The Titans of UI",
   Cabal: "The Vuil'Raith Cabal",
+  // Discordant Stars
+  Axis: "The Shipwrights of Axis",
+  Celdauri: "The Celdauri Trade Confederation",
+  Cymiae: "The Savages of Cymiae",
+  "Dih-Mohn": "The Dih-Mohn Flotilla",
+  Florzen: "The Florzen Profiteers",
+  "Free-Systems": "The Free Systems Compact",
+  Ghemina: "The Ghemina Raiders",
+  Ilyxum: "The Augurs of Ilyxum",
+  Kollecc: "The Kollecc Society",
+  Kortali: "The Kortali Tribunal",
+  "Li-Zho": "The Li-Zho Dynasty",
+  Ltokk: "The L'tokk Khrask",
+  Mirveda: "The Mirveda Protectorate",
+  Mortheus: "The Glimmer of Mortheus",
+  "Myko-Mentori": "The Myko-Mentori",
+  Nivyn: "The Nivyn Star Kings",
+  Olradin: "The Olradin League",
+  Rhodun: "The Zealots of Rhodun",
+  RohDhna: "Roh'Dhna Mechatronics",
+  Tnelis: "The Tnelis Syndicate",
+  Vaden: "The Vaden Banking Clans",
+  Vaylerian: "The Vaylerian Scourge",
+  Veldyr: "The Veldyr Sovereignty",
+  Zelian: "The Zelian Purifier",
+  Bentor: "The Bentor Conglomerate",
+  Cheiran: "The Cheiran Hordes",
+  Edyn: "The Edyn Mandate",
+  Ghoti: "The Ghoti Wayfarers",
+  Gledge: "The Gledge Union",
+  Kjalengard: "The Berserkers of Kjalengard",
+  Kolume: "The Monks of Kolume",
+  Kyro: "The Kyro Sodality",
+  Lanefir: "The Lanefir Remnants",
+  Nokar: "The Nokar Sellships",
 };
 
 export const FACTION_COLORS: FactionType = {
   Arborec:
-    "grayscale(100%) sepia(52%) saturate(341%) hue-rotate(42deg) brightness(90%);",
+    "grayscale(100%) sepia(52%) saturate(341%) hue-rotate(42deg) brightness(90%)",
   Barony:
-    "grayscale(100%) sepia(40%) saturate(600%) hue-rotate(-50deg) contrast(200%);",
-  Saar: "grayscale(100%) sepia(58%) saturate(492%) hue-rotate(350deg);",
-  Muaat: "grayscale(100%) sepia(68%) saturate(646%) hue-rotate(338deg);",
-  Hacan: "grayscale(100%) sepia(98%) saturate(562%) hue-rotate(340deg);",
-  Sol: "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(161deg);",
+    "grayscale(100%) sepia(40%) saturate(600%) hue-rotate(-50deg) contrast(200%)",
+  Saar: "grayscale(100%) sepia(58%) saturate(492%) hue-rotate(350deg)",
+  Muaat: "grayscale(100%) sepia(68%) saturate(646%) hue-rotate(338deg)",
+  Hacan: "grayscale(100%) sepia(98%) saturate(562%) hue-rotate(340deg)",
+  Sol: "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(161deg)",
   Ghosts: "grayscale(100%) sepia(19%) saturate(718%) hue-rotate(159deg)",
   L1Z1X:
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-50deg) brightness(0.6) contrast(2)",
   Mentak:
-    "grayscale(100%) sepia(97%) saturate(864%) hue-rotate(9deg) brightness(114%) contrast(103%);",
+    "grayscale(100%) sepia(97%) saturate(864%) hue-rotate(9deg) brightness(114%) contrast(103%)",
   Naalu:
-    "grayscale(100%) sepia(69%) saturate(759%) hue-rotate(16deg) brightness(102%) contrast(92%);",
+    "grayscale(100%) sepia(69%) saturate(759%) hue-rotate(16deg) brightness(102%) contrast(92%)",
   Nekro:
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-50deg) brightness(0.7) contrast(2)",
   Sardakk:
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-53deg) brightness(0.8) contrast(1.5)",
   "Jol-Nar":
-    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-160deg) brightness(0.7) ",
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-160deg) brightness(0.7)",
   Winnu:
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.6)",
   Xxcha:
@@ -96,7 +136,7 @@ export const FACTION_COLORS: FactionType = {
   Yssaril:
     "grayscale(100%) sepia(70%) saturate(500%) hue-rotate(60deg) brightness(0.8)",
   Argent:
-    "grayscale(100%) sepia(100%) saturate(1738%) hue-rotate(323deg) brightness(99%) contrast(100%);",
+    "grayscale(100%) sepia(100%) saturate(1738%) hue-rotate(323deg) brightness(99%) contrast(100%)",
   Empyrean:
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.7) contrast(1.5)",
   Mahact: "grayscale(100%) sepia(100%) saturate(500%)",
@@ -108,6 +148,73 @@ export const FACTION_COLORS: FactionType = {
     "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-75deg) brightness(0.65) contrast(1.7)",
   Cabal:
     "grayscale(100%) sepia(60%) saturate(400%) hue-rotate(-50deg) brightness(0.65) contrast(2)",
+
+  // Discordant stars
+  Axis: "grayscale(100%) sepia(60%) saturate(450%) hue-rotate(-46deg) brightness(0.6) contrast(1.5)",
+  Celdauri:
+    "grayscale(100%) sepia(100%) saturate(475%) brightness(0.65) contrast(0.9)",
+  Cymiae:
+    "grayscale(100%) sepia(128%) saturate(456%) hue-rotate(325deg) brightness(0.8) contrast(1.1)",
+  "Dih-Mohn":
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.7) contrast(0.9)",
+  Florzen:
+    "grayscale(100%) sepia(80%) saturate(500%) hue-rotate(100deg) brightness(0.8) contrast(0.6)",
+  "Free-Systems":
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-120deg) brightness(0.5) contrast(1.1)",
+  Ghemina:
+    "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(170deg) brightness(0.6)",
+  Ilyxum:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-130deg) brightness(0.5) contrast(1.2)",
+  Kollecc:
+    "grayscale(100%) sepia(78%) saturate(492%) hue-rotate(325deg) brightness(0.6) contrast(0.7)",
+  Kortali:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-130deg) brightness(0.7) contrast(0.9)",
+  "Li-Zho":
+    "grayscale(100%) sepia(58%) saturate(492%) hue-rotate(345deg) brightness(0.7)",
+  Ltokk:
+    "grayscale(100%) sepia(70%) saturate(500%) hue-rotate(38deg) brightness(0.8) contrast(1)",
+  Mirveda:
+    "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(191deg) contrast(1.2) brightness(0.7)",
+  Mortheus:
+    "grayscale(100%) sepia(70%) saturate(386%) hue-rotate(187deg) contrast(1.6) brightness(0.7)",
+  "Myko-Mentori":
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-110deg) brightness(0.8) contrast(1.5)",
+  Nivyn:
+    "grayscale(100%) sepia(98%) saturate(562%) hue-rotate(345deg) brightness(0.7) contrast(0.9)",
+  Olradin:
+    "grayscale(100%) sepia(50%) saturate(562%) hue-rotate(330deg) brightness(0.6) contrast(0.9)",
+  Rhodun:
+    "grayscale(100%) sepia(100%) saturate(280%) hue-rotate(125deg) brightness(0.75)",
+  RohDhna:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-155deg) brightness(0.5) contrast(0.9)",
+  Tnelis:
+    "grayscale(100%) sepia(60%) saturate(400%) hue-rotate(-60deg) brightness(0.6) contrast(1.5)",
+  Vaden:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-240deg) brightness(0.55) contrast(1.2)",
+  Vaylerian:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-250deg) brightness(0.85) contrast(1.4)",
+  Veldyr:
+    "grayscale(100%) sepia(20%) saturate(500%) hue-rotate(-220deg) brightness(0.85) contrast(1.2)",
+  Zelian:
+    "grayscale(100%) sepia(40%) saturate(600%) hue-rotate(-55deg) brightness(0.5) contrast(1.1)",
+  Bentor:
+    "grayscale(100%) sepia(60%) saturate(500%) hue-rotate(-140deg) brightness(0.7) contrast(0.8)",
+  Cheiran:
+    "grayscale(100%) sepia(100%) saturate(200%) hue-rotate(335deg) brightness(0.6) contrast(1.6)",
+  Edyn: "grayscale(100%) sepia(60%) saturate(562%) hue-rotate(380deg) brightness(1) contrast(0.65)",
+  Ghoti:
+    "grayscale(100%) sepia(40%) saturate(386%) hue-rotate(130deg) brightness(1.4) contrast(0.8)",
+  Gledge:
+    "grayscale(100%) sepia(100%) saturate(200%) hue-rotate(335deg) brightness(0.85) contrast(1.6)",
+  Kjalengard:
+    "grayscale(100%) sepia(70%) saturate(800%) hue-rotate(-140deg) brightness(0.7) contrast(1.3)",
+  Kolume:
+    "grayscale(100%) sepia(10%) saturate(400%) hue-rotate(-10deg) brightness(1.1) contrast(1.2)",
+  Kyro: "grayscale(100%) sepia(60%) saturate(200%) hue-rotate(-325deg) brightness(0.9) contrast(1.2)",
+  Lanefir:
+    "grayscale(100%) sepia(60%) saturate(400%) hue-rotate(365deg) brightness(0.9)",
+  Nokar:
+    "grayscale(100%) sepia(70%) saturate(300%) hue-rotate(335deg) brightness(1) contrast(1.2)",
 };
 
 export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
@@ -475,6 +582,385 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       },
     },
   },
+  // Discordant Stars
+  Axis: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Celdauri: {
+    Flagship: {
+      antiFighterBarrage: {
+        rolls: 2,
+        combat: 6,
+      },
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Space_Dock: {
+      antiFighterBarrage: {
+        rolls: 2,
+        combat: 6,
+      },
+    },
+  },
+  Cymiae: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 9,
+      },
+    },
+    Infantry: {
+      groundCombat: {
+        combat: 5,
+      },
+    },
+  },
+  "Dih-Mohn": {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+  },
+  Florzen: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Fighter: {
+      antiFighterBarrage: {
+        combat: 9,
+      },
+    },
+  },
+  "Free-Systems": {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Ghemina: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+      bombardment: {
+        rolls: 4,
+        combat: 5,
+      },
+    },
+  },
+  Ilyxum: {
+    Flagship: {
+      spaceCombat: {
+        combat: 5,
+      },
+    },
+  },
+  Kollecc: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+  },
+  Kortali: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+      bombardment: {
+        combat: 3,
+      },
+    },
+  },
+  "Li-Zho": {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+    Fighter: {
+      bombardment: {
+        combat: 9,
+      },
+    },
+  },
+  Ltokk: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Cruiser: {
+      bombardment: {
+        combat: 8,
+      },
+    },
+  },
+  Mirveda: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 9,
+      },
+    },
+    PDS: {
+      bombardment: {
+        combat: 6,
+      },
+      spaceCannon: {
+        combat: 6,
+      },
+    },
+  },
+  Mortheus: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  "Myko-Mentori": {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Nivyn: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+  },
+  Olradin: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 9,
+      },
+    },
+  },
+  Rhodun: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 9,
+      },
+    },
+  },
+  RohDhna: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+    War_Sun: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 5,
+      },
+    },
+  },
+  Tnelis: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 4,
+        combat: 9,
+      },
+    },
+    Destroyer: {
+      antiFighterBarrage: {
+        rolls: 3,
+        combat: 9,
+      },
+    },
+  },
+  Vaden: {
+    Flagship: {
+      bombardment: {
+        rolls: 2,
+        combat: 5,
+      },
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Vaylerian: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Veldyr: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Dreadnought: {
+      bombardment: {
+        combat: 5,
+      },
+      spaceCannon: {
+        combat: 8,
+      },
+    },
+  },
+  Zelian: {
+    Flagship: {
+      antiFighterBarrage: {
+        combat: 5,
+      },
+      bombardment: {
+        combat: 5,
+      },
+      spaceCombat: {
+        combat: 5,
+      },
+    },
+    Infantry: {
+      bombardment: {
+        combat: 9,
+      },
+    },
+  },
+  Bentor: {
+    Flagship: {
+      antiFighterBarrage: {
+        rolls: 2,
+        combat: 9,
+      },
+      bombardment: {
+        combat: 9,
+      },
+      spaceCannon: {
+        combat: 9,
+      },
+      spaceCombat: {
+        combat: 9,
+      },
+    },
+  },
+  Cheiran: {
+    Flagship: {
+      antiFighterBarrage: {
+        rolls: 2,
+        combat: 7,
+      },
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Edyn: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Ghoti: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Gledge: {
+    Flagship: {
+      bombardment: {
+        combat: 7,
+      },
+      spaceCombat: {
+        combat: 7,
+      },
+    },
+  },
+  Kjalengard: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Carrier: {
+      spaceCombat: {
+        combat: 8,
+      },
+    },
+  },
+  Kolume: {
+    Flagship: {
+      spaceCannon: {
+        combat: 7,
+      },
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+    Mech: {
+      spaceCannon: {
+        rolls: 2,
+        combat: 8,
+      },
+    },
+  },
+  Kyro: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Lanefir: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 7,
+      },
+    },
+  },
+  Nokar: {
+    Destroyer: {
+      spaceCombat: {
+        combat: 8,
+      },
+    },
+  },
 };
 
 export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
@@ -543,6 +1029,108 @@ export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
       },
       groundCombat: {
         combat: 6,
+      },
+    },
+  },
+};
+
+export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
+  string,
+  Partial<UnitCombat>
+> = {
+  "Aegis II": {
+    Dreadnought: {
+      spaceCombat: {
+        combat: 4,
+      },
+    },
+  },
+  "Corsair II": {
+    Fighter: {
+      antiFighterBarrage: {
+        combat: 9,
+      },
+    },
+  },
+  "Heavy Bomber II": {
+    Fighter: {
+      bombardment: {
+        combat: 9,
+      },
+    },
+  },
+  "Shattered Sky II": {
+    Cruiser: {
+      bombardment: {
+        combat: 6,
+      },
+    },
+  },
+  "Gauss Cannon II": {
+    PDS: {
+      bombardment: {
+        combat: 4,
+      },
+      spaceCannon: {
+        combat: 4,
+      },
+    },
+  },
+  "Voidflare Warden II": {
+    Mech: {
+      groundCombat: {
+        combat: 4,
+      },
+    },
+  },
+  "Terrafactory II": {
+    War_Sun: {
+      bombardment: {
+        rolls: 3,
+        combat: 3,
+      },
+      spaceCombat: {
+        rolls: 3,
+        combat: 3,
+      },
+    },
+  },
+  "Blockade Runner II": {
+    Destroyer: {
+      antiFighterBarrage: {
+        rolls: 3,
+        combat: 9,
+      },
+    },
+  },
+  "Lancer Dreadnought II": {
+    Dreadnought: {
+      bombardment: {
+        combat: 5,
+      },
+      spaceCannon: {
+        combat: 5,
+      },
+    },
+  },
+  "Impactor II": {
+    Infantry: {
+      bombardment: {
+        combat: 8,
+      },
+    },
+  },
+  "Star Dragon II": {
+    Carrier: {
+      spaceCombat: {
+        combat: 7,
+      },
+    },
+  },
+  "Sabre II": {
+    Destroyer: {
+      spaceCombat: {
+        combat: 7,
       },
     },
   },
@@ -628,6 +1216,69 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     },
   },
   Cabal: {},
+  // Discordant Stars
+  Axis: {},
+  Celdauri: {},
+  Cymiae: {
+    Infantry: {
+      groundCombat: {
+        combat: 4,
+      },
+    },
+  },
+  "Dih-Mohn": {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Aegis II"],
+  },
+  Florzen: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Heavy Bomber II"],
+  },
+  "Free-Systems": {},
+  Ghemina: {},
+  Ilyxum: {},
+  Kollecc: {},
+  Kortali: {},
+  "Li-Zho": {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Corsair II"],
+  },
+  Ltokk: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Shattered Sky II"],
+  },
+  Mirveda: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Gauss Cannon II"],
+  },
+  Mortheus: {},
+  "Myko-Mentori": {},
+  Nivyn: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Voidflare Warden II"],
+  },
+  Olradin: {},
+  Rhodun: {},
+  RohDhna: {},
+  Tnelis: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Blockade Runner II"],
+  },
+  Vaden: {},
+  Vaylerian: {},
+  Veldyr: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Lancer Dreadnought II"],
+  },
+  Zelian: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Impactor II"],
+  },
+  Bentor: {},
+  Cheiran: {},
+  Edyn: {},
+  Ghoti: {},
+  Gledge: {},
+  Kjalengard: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Star Dragon II"],
+  },
+  Kolume: {},
+  Kyro: {},
+  Lanefir: {},
+  Nokar: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Sabre II"],
+  },
 };
 
 export const FACTION_STARTING_TECHNOLOGY: Partial<

@@ -109,6 +109,7 @@ const DEFAULT_NUM_UNITS = {
   Carrier: 0,
   Fighter: 0,
   PDS: 0,
+  Space_Dock: 0,
   Mech: 0,
   Infantry: 0,
 };
@@ -122,6 +123,7 @@ const DEFAULT_UNIT_UPGRADES = {
   Carrier: false,
   Fighter: false,
   PDS: false,
+  Space_Dock: false,
   Mech: false,
   Infantry: false,
 };

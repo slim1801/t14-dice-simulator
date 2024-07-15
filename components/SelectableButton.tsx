@@ -2,14 +2,14 @@ import { PropsWithChildren } from "react";
 import styled, { css } from "styled-components";
 
 interface SelectableButtonProps {
-  selected: boolean;
-  highlightColor: string;
-  onClick: () => void;
+  selected?: boolean;
+  highlightColor?: string;
+  onClick?: () => void;
 }
 
 interface SelectableButtonComponentProps {
-  selected: boolean;
-  highlightColor: string;
+  selected?: boolean;
+  highlightColor?: string;
 }
 
 const SelectableButtonComponent = styled.button<SelectableButtonComponentProps>`

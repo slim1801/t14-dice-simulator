@@ -1,5 +1,6 @@
 import Faction from "../components/Faction";
 import { Layout } from "../components/Layout";
+import { ALL_DISCORDANT_FACTIONS } from "../constants/discordantStars/factions";
 import { ALL_FACTIONS } from "../constants/factions";
 import { Factions } from "../types";
 
@@ -34,7 +35,11 @@ export async function getStaticProps({
 }
 
 export async function getStaticPaths() {
-  const paths = ALL_FACTIONS.map((faction) => ({ params: { faction } }));
+  const paths = [...ALL_DISCORDANT_FACTIONS, ...ALL_FACTIONS].map(
+    (faction) => ({
+      params: { faction },
+    })
+  );
   return {
     paths,
     fallback: false,
