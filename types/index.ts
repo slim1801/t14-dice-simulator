@@ -144,6 +144,24 @@ export type FactionExclusiveUnitCombatTechnology =
   | "Memoria II"
   | "Hel Titan II";
 
+export type DSFactionExclusiveUnitCombatTechnology =
+  | "Aegis II"
+  | "Trade Port II"
+  | "Unholy Abomination II"
+  | "Corsair II"
+  | "Heavy Bomber II"
+  | "Shattered Sky II"
+  | "Gauss Cannon II"
+  | "Voidflare Warden II"
+  | "Terrafactory II"
+  | "Blockade Runner II"
+  | "Raider II"
+  | "Lancer Dreadnought II"
+  | "Impactor II"
+  | "Star Dragon II"
+  | "Sabre II"
+  | "Raider II";
+
 export type FactionExclusiveCombatTechnology = "Supercharge";
 
 export type FactionExclusiveTechnology =
@@ -159,9 +177,7 @@ export type CombatLeaderAbilities =
   | "Rickar Rickani"
   | "Evelyn Delouis"
   | "Trrakan Aun Zulok"
-  | "Ta Zern"
-  // Discordant Stars
-  | "Davish S'Norri";
+  | "Ta Zern";
 export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;
 export type FactionExclusiveAbilities = Record<Factions, FactionExclusives[]>;
 

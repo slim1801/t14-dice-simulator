@@ -3,6 +3,8 @@ import {
   BespokeUnitCombat,
   CombatEvalFunc,
   CombatTechnology,
+  DSFactionExclusiveUnitCombatTechnology,
+  FactionExclusiveUnitCombatTechnology,
   Factions,
   UnitCombat,
 } from "../types";
@@ -1043,7 +1045,10 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
 };
 
-export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
+export const FACTION_UNIT_COMBAT: Record<
+  FactionExclusiveUnitCombatTechnology,
+  Partial<UnitCombat>
+> = {
   "Spec Ops II": {
     Infantry: {
       groundCombat: {
@@ -1115,7 +1120,7 @@ export const FACTION_UNIT_COMBAT: Record<string, Partial<UnitCombat>> = {
 };
 
 export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
-  string,
+  DSFactionExclusiveUnitCombatTechnology,
   Partial<UnitCombat>
 > = {
   "Aegis II": {
@@ -1125,11 +1130,18 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
       },
     },
   },
-  "Trade Port": {
+  "Trade Port II": {
     Space_Dock: {
       antiFighterBarrage: {
         combat: 6,
         rolls: 2,
+      },
+    },
+  },
+  "Unholy Abomination II": {
+    Infantry: {
+      groundCombat: {
+        combat: 4,
       },
     },
   },
@@ -1310,14 +1322,10 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   // Discordant Stars
   Axis: {},
   Celdauri: {
-    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Trade Port"],
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Trade Port II"],
   },
   Cymiae: {
-    Infantry: {
-      groundCombat: {
-        combat: 4,
-      },
-    },
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Unholy Abomination II"],
   },
   "Dih-Mohn": {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Aegis II"],

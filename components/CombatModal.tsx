@@ -17,6 +17,8 @@ import {
   PromissoryNotes,
   CombatEvalFunc,
   UnitCombatDetailsList,
+  FactionExclusiveUnitCombatTechnology,
+  FactionExclusiveTechnology,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -24,6 +26,7 @@ import Combat from "./Combat";
 import RoundButton from "./RoundButton";
 import TechnologyButton from "./TechnologyButton";
 import {
+  DS_FACTION_EXCLUSIVE_TECHNOLOGY,
   FACTION_EXCLUSIVE_TECHNOLOGY,
   FACTION_TECHNOLOGY,
   TECHNOLOGY_COMBAT,
@@ -43,6 +46,7 @@ import {
 } from "../constants/factionAbilities";
 import SelectBox from "./SelectBox";
 import {
+  DISCORDANT_STARS_FACTION_UNIT_COMBAT,
   FACTION_STARTING_TECHNOLOGY,
   FACTION_TECH_COMBAT,
   FACTION_UNIT_COMBAT,
@@ -54,6 +58,7 @@ import {
 } from "../constants/promissory";
 import { calculateCombat } from "../utils/combat";
 import { Overlay } from "./Overlay";
+import { useDiscordantStarsStateContext } from "../providers/discordantStars/discordantStars.provider";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -350,8 +355,10 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     []
   );
 
-  const [valefarX, setValefarX] = useState("");
-  const [valefarY, setValefarY] = useState("");
+  const [valefarX, setValefarX] =
+    useState<FactionExclusiveUnitCombatTechnology>();
+  const [valefarY, setValefarY] =
+    useState<FactionExclusiveUnitCombatTechnology>();
 
   const onAbilitiesLeadersSelected = useCallback(
     (leadersAbility: CombatLeaderAbilities) => {
@@ -412,22 +419,30 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
       };
 
       // Apply Nekro Unit Tech
-      const valefarXUnitTech = FACTION_UNIT_COMBAT?.[valefarX];
-      const valefarYUnitTech = FACTION_UNIT_COMBAT?.[valefarY];
 
-      if (valefarXUnitTech) {
-        _unitCombat = deepmerge(_unitCombat, valefarXUnitTech);
+      const allFactions = {
+        ...FACTION_UNIT_COMBAT,
+        ...DISCORDANT_STARS_FACTION_UNIT_COMBAT,
+      };
+
+      if (valefarX) {
+        const valefarXUnitTech = allFactions?.[valefarX];
+        if (valefarXUnitTech) {
+          _unitCombat = deepmerge(_unitCombat, valefarXUnitTech);
+        }
+
+        const valefarXTech = FACTION_TECH_COMBAT?.[valefarX];
+        runCombatEvalFunc(valefarXTech);
       }
-      if (valefarYUnitTech) {
-        _unitCombat = deepmerge(_unitCombat, valefarYUnitTech);
+      if (valefarY) {
+        const valefarYUnitTech = allFactions?.[valefarY];
+        if (valefarYUnitTech) {
+          _unitCombat = deepmerge(_unitCombat, valefarYUnitTech);
+        }
+
+        const valefarYTech = FACTION_TECH_COMBAT?.[valefarY];
+        runCombatEvalFunc(valefarYTech);
       }
-
-      // Apply Nekro Tech
-      const valefarXTech = FACTION_TECH_COMBAT?.[valefarX];
-      runCombatEvalFunc(valefarXTech);
-
-      const valefarYTech = FACTION_TECH_COMBAT?.[valefarY];
-      runCombatEvalFunc(valefarYTech);
 
       // Calculate tech
       const techKeys = Object.keys(selectedTechnologies) as CombatTechnology[];
@@ -756,6 +771,19 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     }
   }, [faction]);
 
+  const [{ isDiscordantStars }, setDiscordantStarsState] =
+    useDiscordantStarsStateContext();
+
+  const factionExclusiveTechs = useMemo(() => {
+    if (isDiscordantStars) {
+      return [
+        ...FACTION_EXCLUSIVE_TECHNOLOGY,
+        ...DS_FACTION_EXCLUSIVE_TECHNOLOGY,
+      ];
+    }
+    return [...FACTION_EXCLUSIVE_TECHNOLOGY];
+  }, [isDiscordantStars]);
+
   if (!shouldShow) {
     return null;
   }
@@ -883,26 +911,30 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                   <HeaderSelectContainer>
                     <HeaderSelectLabel>X:</HeaderSelectLabel>
                     <SelectBox
-                      options={FACTION_EXCLUSIVE_TECHNOLOGY.map(
-                        (factionTech) => ({
-                          label: factionTech,
-                          value: factionTech,
-                        })
-                      )}
-                      onChange={(e) => setValefarX(e.target.value)}
+                      options={factionExclusiveTechs.map((factionTech) => ({
+                        label: factionTech,
+                        value: factionTech,
+                      }))}
+                      onChange={(e) =>
+                        setValefarX(
+                          e.target.value as FactionExclusiveUnitCombatTechnology
+                        )
+                      }
                       value={valefarX}
                     />
                   </HeaderSelectContainer>
                   <HeaderSelectContainer>
                     <HeaderSelectLabel>Y:</HeaderSelectLabel>
                     <SelectBox
-                      options={FACTION_EXCLUSIVE_TECHNOLOGY.map(
-                        (factionTech) => ({
-                          label: factionTech,
-                          value: factionTech,
-                        })
-                      )}
-                      onChange={(e) => setValefarY(e.target.value)}
+                      options={factionExclusiveTechs.map((factionTech) => ({
+                        label: factionTech,
+                        value: factionTech,
+                      }))}
+                      onChange={(e) =>
+                        setValefarY(
+                          e.target.value as FactionExclusiveUnitCombatTechnology
+                        )
+                      }
                       value={valefarY}
                     />
                   </HeaderSelectContainer>
