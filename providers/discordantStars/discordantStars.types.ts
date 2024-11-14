@@ -3,7 +3,7 @@ export interface DiscordantStarsState {
 }
 
 export enum DiscordantStarsActionKind {
-  IS_DISCORDANT_STARS = "IS_DISCORDANT_STARS",
+  INCLUDE_DISCORDANT_STARS = "INCLUDE_DISCORDANT_STARS",
 }
 
 export interface IsDiscordantStarsAction {

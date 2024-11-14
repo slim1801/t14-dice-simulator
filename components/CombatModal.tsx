@@ -53,6 +53,7 @@ import {
   PROMISSORY_NOTE_COMBAT,
 } from "../constants/promissory";
 import { calculateCombat } from "../utils/combat";
+import { Overlay } from "./Overlay";
 
 interface CombatModalProps {
   shouldShow: boolean;
@@ -80,18 +81,6 @@ const Content = styled.div`
 
 const Footer = styled.div`
   padding: 5px;
-`;
-
-const Overlay = styled.div`
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-color: rgba(100, 100, 100, 0.5);
 `;
 
 const Rolling = styled.div`
@@ -235,6 +224,7 @@ const UnitOrder: Units[] = [
   "Carrier",
   "Fighter",
   "PDS",
+  "Space_Dock",
   "Mech",
   "Infantry",
 ];
@@ -628,7 +618,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         const rollhits = roll[activeUnit]?.map((unitRolls) => {
           const combatStrength: number = combatType
             ? calculateCombat(
-                unitCombats[unitRollIndex]?.[activeUnit]?.[combatType]
+                combatType,
+                unitCombats[unitRollIndex]?.[activeUnit]
               ) || 1
             : 0;
 
@@ -773,7 +764,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     <Overlay>
       <ModalContent>
         <Header>
-          <CloseButton onClick={onClose}>X</CloseButton>
+          <CloseButton onClick={onClose}>x</CloseButton>
         </Header>
         <Accordion
           label="Modifiers"
@@ -935,7 +926,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                     combat={
                       combatType
                         ? calculateCombat(
-                            unitCombats[index]?.[unit]?.[combatType]
+                            combatType,
+                            unitCombats[index]?.[unit]
                           )
                         : undefined
                     }

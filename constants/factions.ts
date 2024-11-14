@@ -1,5 +1,6 @@
 import {
   BasePokFactions,
+  BespokeUnitCombat,
   CombatEvalFunc,
   CombatTechnology,
   Factions,
@@ -215,6 +216,71 @@ export const FACTION_COLORS: FactionType = {
     "grayscale(100%) sepia(60%) saturate(400%) hue-rotate(365deg) brightness(0.9)",
   Nokar:
     "grayscale(100%) sepia(70%) saturate(300%) hue-rotate(335deg) brightness(1) contrast(1.2)",
+};
+
+export const BESPOKE_FACTION_COMBAT: Partial<
+  Record<Factions, Partial<BespokeUnitCombat>>
+> = {
+  "Free-Systems": {
+    Flagship: {
+      bespokeLabel: "Planet Traits",
+      spaceCombat: { rollMod: [1] },
+    },
+  },
+  Bentor: {
+    Flagship: {
+      bespokeLabel: "Fragment Tokens",
+      antiFighterBarrage: {
+        combatMod: [1],
+      },
+      bombardment: {
+        combatMod: [1],
+      },
+      spaceCannon: {
+        combatMod: [1],
+      },
+      spaceCombat: {
+        combatMod: [1],
+      },
+    },
+  },
+  Gledge: {
+    Flagship: {
+      bespokeLabel: "Adjacent Mechs",
+      bombardment: { rollMod: [1] },
+      spaceCombat: { rollMod: [1] },
+    },
+  },
+  Mirveda: {
+    Mech: {
+      bespokeLabel: "Every 2 Unit Upgrades",
+      groundCombat: { combatMod: [1] },
+    },
+  },
+  Edyn: {
+    Flagship: {
+      bespokeLabel: "Laws in play",
+      spaceCombat: { combatMod: [1] },
+    },
+  },
+  Rhodun: {
+    Flagship: {
+      bespokeLabel: "Opponent Unit Upgrades",
+      spaceCombat: { combatMod: [1] },
+    },
+    Mech: {
+      bespokeLabel: "Opponent Faction Techs",
+      groundCombat: { combatMod: [1] },
+    },
+  },
+  Zelian: {
+    Flagship: {
+      bespokeLabel: "Adjacent Asteroid Fields",
+      bombardment: { rollMod: [1] },
+      antiFighterBarrage: { rollMod: [1] },
+      spaceCombat: { rollMod: [1] },
+    },
+  },
 };
 
 export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
@@ -582,6 +648,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       },
     },
   },
+
   // Discordant Stars
   Axis: {
     Flagship: {
@@ -653,6 +720,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Ghemina: {
     Flagship: {
+      totalUnits: 2,
       spaceCombat: {
         rolls: 2,
         combat: 7,
@@ -759,7 +827,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     Flagship: {
       spaceCombat: {
         rolls: 2,
-        combat: 9,
+        combat: 5,
       },
     },
   },
@@ -767,7 +835,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     Flagship: {
       spaceCombat: {
         rolls: 2,
-        combat: 9,
+        combat: 7,
       },
     },
   },
@@ -881,6 +949,12 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combat: 7,
       },
     },
+    Dreadnought: {
+      totalUnits: 7,
+    },
+    Mech: {
+      totalUnits: 5,
+    },
   },
   Edyn: {
     Flagship: {
@@ -955,6 +1029,12 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     },
   },
   Nokar: {
+    Flagship: {
+      spaceCombat: {
+        rolls: 2,
+        combat: 9,
+      },
+    },
     Destroyer: {
       spaceCombat: {
         combat: 8,
@@ -1045,17 +1125,25 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
       },
     },
   },
+  "Trade Port": {
+    Space_Dock: {
+      antiFighterBarrage: {
+        combat: 6,
+        rolls: 2,
+      },
+    },
+  },
   "Corsair II": {
     Fighter: {
       antiFighterBarrage: {
-        combat: 9,
+        combat: 8,
       },
     },
   },
   "Heavy Bomber II": {
     Fighter: {
       bombardment: {
-        combat: 9,
+        combat: 8,
       },
     },
   },
@@ -1098,10 +1186,13 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   "Blockade Runner II": {
     Destroyer: {
       antiFighterBarrage: {
-        rolls: 3,
-        combat: 9,
+        rolls: 4,
+        combat: 6,
       },
     },
+  },
+  "Raider II": {
+    Cruiser: {},
   },
   "Lancer Dreadnought II": {
     Dreadnought: {
@@ -1218,7 +1309,9 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   Cabal: {},
   // Discordant Stars
   Axis: {},
-  Celdauri: {},
+  Celdauri: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Trade Port"],
+  },
   Cymiae: {
     Infantry: {
       groundCombat: {
@@ -1230,7 +1323,7 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Aegis II"],
   },
   Florzen: {
-    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Heavy Bomber II"],
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Corsair II"],
   },
   "Free-Systems": {},
   Ghemina: {},
@@ -1238,7 +1331,7 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   Kollecc: {},
   Kortali: {},
   "Li-Zho": {
-    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Corsair II"],
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Heavy Bomber II"],
   },
   Ltokk: {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Shattered Sky II"],
@@ -1253,12 +1346,16 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Olradin: {},
   Rhodun: {},
-  RohDhna: {},
+  RohDhna: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Terrafactory II"],
+  },
   Tnelis: {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Blockade Runner II"],
   },
   Vaden: {},
-  Vaylerian: {},
+  Vaylerian: {
+    ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Raider II"],
+  },
   Veldyr: {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Lancer Dreadnought II"],
   },

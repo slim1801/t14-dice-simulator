@@ -7,7 +7,8 @@ interface NumUnitsProps {
 
 const NumUnitsComponent = styled.div`
   height: 100%;
-  width: 60px;
+  width: 30px;
+  font-size: 12px;
   display: flex;
   align-items: center;
 `;
@@ -18,7 +19,7 @@ const NumUnits: React.FunctionComponent<NumUnitsProps> = ({
 }) => {
   return (
     <NumUnitsComponent>
-      {rollsPerUnit !== undefined && `(${rollsPerUnit}) `}x {numUnits}
+      {rollsPerUnit !== undefined && `(${rollsPerUnit})`}x{numUnits}
     </NumUnitsComponent>
   );
 };

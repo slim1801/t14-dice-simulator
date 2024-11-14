@@ -8,7 +8,7 @@ export function discordantStarsReducer(
   state: DiscordantStarsState,
   action: IsDiscordantStarsAction
 ): DiscordantStarsState {
-  if (action.type === DiscordantStarsActionKind.IS_DISCORDANT_STARS) {
+  if (action.type === DiscordantStarsActionKind.INCLUDE_DISCORDANT_STARS) {
     return { isDiscordantStars: action.payload };
   }
   return state;

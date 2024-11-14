@@ -66,7 +66,10 @@ export type CombatType =
 
 export type Combat = {
   [key in CombatType]?: CombatDetails;
-} & { name?: string };
+} & {
+  name?: string;
+  totalUnits?: number;
+};
 
 export interface UnitHit {
   hit: boolean;
@@ -88,6 +91,12 @@ export interface UnitCombatDetails {
   unitCombat: UnitCombat;
   numUnits: NumUnits;
 }
+
+export type BespokeUnitCombat = Record<Units, BespokeCombat>;
+export type BespokeCombat = Combat & {
+  bespokeLabel?: string;
+  number?: number;
+};
 
 export type NumUnits = Record<Units, number>;
 export type UnitUpgraded = Record<Units, boolean>;
@@ -150,7 +159,9 @@ export type CombatLeaderAbilities =
   | "Rickar Rickani"
   | "Evelyn Delouis"
   | "Trrakan Aun Zulok"
-  | "Ta Zern";
+  | "Ta Zern"
+  // Discordant Stars
+  | "Davish S'Norri";
 export type FactionLeaderAbilities = Record<Factions, CombatLeaderAbilities[]>;
 export type FactionExclusiveAbilities = Record<Factions, FactionExclusives[]>;
 

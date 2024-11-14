@@ -6,11 +6,11 @@ interface CombatProps {
 
 const CombatContainer = styled.div`
   text-align: center;
-  width: 60px;
+  width: 50px;
 `;
 
 const CombatNumber = styled.div`
-  font-size: 30px;
+  font-size: 25px;
 `;
 
 const CombatLabel = styled.div`

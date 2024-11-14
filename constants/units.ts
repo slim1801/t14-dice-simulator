@@ -1,4 +1,10 @@
-import { NumUnits, UnitCombat, UnitCombatAbilities, Units } from "../types";
+import {
+  CombatType,
+  NumUnits,
+  UnitCombat,
+  UnitCombatAbilities,
+  Units,
+} from "../types";
 
 export const UNIT_LIST: Units[] = [
   "Flagship",
@@ -11,6 +17,15 @@ export const UNIT_LIST: Units[] = [
   "PDS",
   "Mech",
   "Infantry",
+];
+
+export const UNIT_ABILITIES: CombatType[] = [
+  "spaceCannon",
+  "spaceCombat",
+  "antiFighterBarrage",
+  "bombardment",
+  "groundSpaceCannon",
+  "groundCombat",
 ];
 
 export const EMPTY_COMBAT_STRENGTH: UnitCombat = {
@@ -28,9 +43,22 @@ export const EMPTY_COMBAT_STRENGTH: UnitCombat = {
 };
 
 export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
-  Flagship: {},
-  War_Sun: {},
+  Flagship: {
+    totalUnits: 1,
+  },
+  War_Sun: {
+    totalUnits: 2,
+    spaceCombat: {
+      combat: 3,
+      rolls: 3,
+    },
+    bombardment: {
+      rolls: 3,
+      combat: 3,
+    },
+  },
   Dreadnought: {
+    totalUnits: 5,
     spaceCombat: {
       combat: 5,
     },
@@ -39,11 +67,13 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Cruiser: {
+    totalUnits: 8,
     spaceCombat: {
       combat: 7,
     },
   },
   Destroyer: {
+    totalUnits: 8,
     spaceCombat: {
       combat: 9,
     },
@@ -53,6 +83,7 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Carrier: {
+    totalUnits: 4,
     spaceCombat: {
       combat: 9,
     },
@@ -63,6 +94,7 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   PDS: {
+    totalUnits: 6,
     spaceCannon: {
       combat: 6,
     },
@@ -70,8 +102,11 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
       combat: 6,
     },
   },
-  Space_Dock: {},
+  Space_Dock: {
+    totalUnits: 3,
+  },
   Mech: {
+    totalUnits: 4,
     groundCombat: {
       combat: 6,
     },
@@ -395,5 +430,27 @@ export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
   Kolume: null,
   Kyro: null,
   Lanefir: null,
-  Nokar: null,
+  Nokar: {
+    Flagship: {
+      name: "Annah Regia",
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number,
+        numUnits?: NumUnits
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          const numDestroyers = numUnits?.Destroyer || 0;
+          return {
+            Flagship: {
+              spaceCombat: {
+                combatMod: [numDestroyers],
+              },
+            },
+          };
+        }
+        return null;
+      },
+    },
+  },
 };

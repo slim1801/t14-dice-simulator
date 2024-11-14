@@ -1,5 +1,11 @@
-import { CombatLeaderAbilities, CombatEvalFunc } from "../types";
+import {
+  CombatLeaderAbilities,
+  CombatEvalFunc,
+  Units,
+  UnitCombat,
+} from "../types";
 import { combatModFunc, optimisedRoll } from "../utils/combat";
+import { UNIT_LIST } from "./units";
 
 export const FACTION_COMBAT_LEADERS: CombatLeaderAbilities[] = [
   "Viscount Unlenn",

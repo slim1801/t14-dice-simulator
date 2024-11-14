@@ -2,10 +2,10 @@ import { PropsWithChildren } from "react";
 import styled from "styled-components";
 
 interface RoundButtonProps {
-  disabled: boolean;
+  disabled?: boolean;
   radius: number;
   color?: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 interface RoundButtonComponentProps {
@@ -20,18 +20,18 @@ const RoundButtonComponent = styled.button<RoundButtonComponentProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 30px;
+  font-size: 15px;
   font-weight: 500;
   background: none;
   color: ${(props) => props.color};
-  border: 4px solid ${(props) => props.color};
+  border: 2px solid ${(props) => props.color};
   padding: 0;
   cursor: pointer;
   outline: inherit;
 
   :disabled {
     color: grey;
-    border: 4px solid grey;
+    border: 2px solid grey;
   }
 `;
 

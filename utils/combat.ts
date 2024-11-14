@@ -1,5 +1,5 @@
 import {
-  CombatDetails,
+  Combat,
   CombatEvalFunc,
   CombatType,
   NumUnits,
@@ -53,7 +53,7 @@ export const optimisedRoll = (
             const combatDetails = _unitCombat?.[combatType];
 
             if (combatDetails && numUnits && numUnits?.[unitKey] > 0) {
-              const totalCombat = calculateCombat(combatDetails);
+              const totalCombat = calculateCombat(combatType, _unitCombat);
               if (totalCombat !== undefined && bestCombatValue > totalCombat) {
                 bestCombatValue = totalCombat;
                 bestUnit = unitKey;
@@ -78,9 +78,11 @@ export const optimisedRoll = (
   };
 };
 
-export const calculateCombat = (combatDetails?: CombatDetails) => {
+export const calculateCombat = (combatType: CombatType, combat?: Combat) => {
+  const combatDetails = combat?.[combatType];
+
   if (combatDetails?.combat !== undefined) {
-    const baseCombat: number = combatDetails.combat;
+    const baseCombat = combatDetails.combat;
 
     const combatMod = (combatDetails?.combatMod || []).reduce(
       (acc, val) => acc + val,
@@ -88,4 +90,19 @@ export const calculateCombat = (combatDetails?: CombatDetails) => {
     );
     return Math.max(baseCombat - combatMod, 1);
   }
+};
+
+export const calculateRolls = (combatType: CombatType, combat?: Combat) => {
+  const combatDetails = combat?.[combatType];
+
+  let totalRolls = combatDetails?.rolls;
+  const rollMods = combatDetails?.rollMod;
+
+  if (rollMods !== undefined) {
+    const rollMod = rollMods.reduce((acc, val) => acc + val, 0);
+    if (rollMod > 0) {
+      totalRolls = (totalRolls || 0) + rollMod;
+    }
+  }
+  return totalRolls;
 };

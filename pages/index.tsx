@@ -9,6 +9,7 @@ import SelectableButton from "../components/SelectableButton";
 import { useDiscordantStarsStateContext } from "../providers/discordantStars/discordantStars.provider";
 import { DiscordantStarsActionKind } from "../providers/discordantStars/discordantStars.types";
 import { ALL_DISCORDANT_FACTIONS } from "../constants/discordantStars/factions";
+import { useMemo } from "react";
 
 const Heading = styled.h1`
   text-align: center;
@@ -59,12 +60,12 @@ const Home: NextPage = () => {
               selected={isDiscordantStars}
               onClick={() => {
                 setDiscordantStarsState?.({
-                  type: DiscordantStarsActionKind.IS_DISCORDANT_STARS,
+                  type: DiscordantStarsActionKind.INCLUDE_DISCORDANT_STARS,
                   payload: !isDiscordantStars,
                 });
               }}
             >
-              Discordant Stars
+              Include Discordant Stars
             </SelectableButton>
           </DiscordantStarsButtonContainer>
           {isDiscordantStars && (
@@ -83,19 +84,17 @@ const Home: NextPage = () => {
               <Divider />
             </>
           )}
-          {!isDiscordantStars && (
-            <ImageGrid>
-              {BASE_POK_FACTIONS.map((faction) => (
-                <ImageCell key={faction}>
-                  <Link href={`/${faction}`}>
-                    <a>
-                      <FactionImage faction={faction} />
-                    </a>
-                  </Link>
-                </ImageCell>
-              ))}
-            </ImageGrid>
-          )}
+          <ImageGrid>
+            {BASE_POK_FACTIONS.map((faction) => (
+              <ImageCell key={faction}>
+                <Link href={`/${faction}`}>
+                  <a>
+                    <FactionImage faction={faction} />
+                  </a>
+                </Link>
+              </ImageCell>
+            ))}
+          </ImageGrid>
         </Layout>
       </main>
     </div>
