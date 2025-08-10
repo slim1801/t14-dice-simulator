@@ -3,20 +3,24 @@ import {
   CombatTechnology,
   DSFactionExclusiveUnitCombatTechnology,
   FactionExclusiveTechnology,
-  FactionExclusiveUnitCombatTechnology,
   FactionTechnologies,
+  Technology,
   UnitCombat,
   Units,
 } from "../types";
-import { optimisedRoll } from "../utils/combat";
+import { combatModFunc, optimisedRoll } from "../utils/combat";
 import { ALL_FACTIONS } from "./factions";
 
 export const FACTION_TECHNOLOGY: FactionTechnologies = ALL_FACTIONS.reduce(
   (acc, faction) => {
-    acc[faction] = [
+    const techs: Technology[] = [
       { name: "Antimass Deflectors", type: "Propulsion" },
       { name: "Plasma Scoring", type: "Warfare" },
     ];
+    if (faction === 'NaazRokha') {
+      techs.push({ name: "Supercharge", type: "Warfare" })
+    }
+    acc[faction] = techs;
     return acc;
   },
   {} as FactionTechnologies
@@ -52,9 +56,10 @@ export const TECHNOLOGY_COMBAT: Record<CombatTechnology, CombatEvalFunc> = {
     ["bombardment", "antiFighterBarrage", "spaceCannon", "groundSpaceCannon"],
     [1]
   ),
+  "Supercharge": combatModFunc([1])
 };
 
-export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveUnitCombatTechnology[] =
+export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveTechnology[] =
   [
     "Spec Ops II",
     "Super-Dreadnought II",
@@ -63,6 +68,7 @@ export const FACTION_EXCLUSIVE_TECHNOLOGY: FactionExclusiveUnitCombatTechnology[
     "Strike Wing Alpha II",
     "Memoria II",
     "Hel Titan II",
+    "Supercharge"
   ];
 
 export const DS_FACTION_EXCLUSIVE_TECHNOLOGY: DSFactionExclusiveUnitCombatTechnology[] =

@@ -110,7 +110,7 @@ export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
 export type UnitCombatDetailsList = UnitCombatDetails[];
 
-export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring";
+export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring" | "Supercharge";
 export type CombatActionCards =
   | "Bunker"
   | "Fighter Prototype"
@@ -130,7 +130,7 @@ export type AdditionalCombatFunc = (
 
 export type TechnologyType = "Biotic" | "Propulsion" | "Cybernetic" | "Warfare";
 
-interface Technology {
+export interface Technology {
   name: CombatTechnology;
   type: TechnologyType;
 }

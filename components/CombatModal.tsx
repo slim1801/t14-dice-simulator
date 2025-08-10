@@ -771,7 +771,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     }
   }, [faction]);
 
-  const [{ isDiscordantStars }, setDiscordantStarsState] =
+  const [{ isDiscordantStars }] =
     useDiscordantStarsStateContext();
 
   const factionExclusiveTechs = useMemo(() => {
