@@ -936,14 +936,19 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
   // Discordant Stars
   Axis: {
     Flagship: {
+      name: "Bearer of Heavens",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Forgetender",
+    },
   },
   Celdauri: {
     Flagship: {
+      name: "Supremacy",
       antiFighterBarrage: {
         rolls: 2,
         combat: 6,
@@ -954,56 +959,82 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
       },
     },
     Space_Dock: {
+      name: "Trade Port",
       antiFighterBarrage: {
         rolls: 2,
         combat: 6,
       },
     },
+    Mech: {
+      name: "Minuteman",
+    },
   },
   Cymiae: {
     Flagship: {
+      name: "Reprocessor Alpha",
       spaceCombat: {
         rolls: 2,
         combat: 9,
       },
     },
     Infantry: {
+      name: "Unholy Abomination",
       groundCombat: {
         combat: 5,
       },
     },
+    Mech: {
+      name: "Revenant",
+    },
   },
   "Dih-Mohn": {
     Flagship: {
+      name: "Maximus",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
+    Dreadnought: {
+      name: "Aegis",
+    },
+    Mech: {
+      name: "Repairitor",
+    },
   },
   Florzen: {
     Flagship: {
+      name: "Man O' War",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
     Fighter: {
+      name: "Corsair",
       antiFighterBarrage: {
         combat: 9,
       },
     },
+    Mech: {
+      name: "Privateer",
+    },
   },
   "Free-Systems": {
     Flagship: {
+      name: "Vox",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Liberator",
+    },
   },
   Ghemina: {
     Flagship: {
+      name: "The Lady/Lord",
       totalUnits: 2,
       spaceCombat: {
         rolls: 2,
@@ -1013,25 +1044,60 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         rolls: 4,
         combat: 5,
       },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number,
+        numUnits?: NumUnits
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          const numFlagships = numUnits?.Flagship;
+          if (numFlagships === 2) {
+            return {
+              Flagship: {
+                spaceCombat: {
+                  combatMod: [2],
+                },
+              },
+            };
+          }
+        }
+        return null;
+      },
+    },
+    Carrier: {
+      name: "Combat Transport",
+    },
+    Mech: {
+      name: "Jotun",
     },
   },
   Ilyxum: {
     Flagship: {
+      name: "Nemsys",
       spaceCombat: {
         combat: 5,
       },
     },
+    Mech: {
+      name: "Iledrith",
+    },
   },
   Kollecc: {
     Flagship: {
+      name: "Nightingale V",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
+    Mech: {
+      name: "Nightshade Vanguard",
+    },
   },
   Kortali: {
     Flagship: {
+      name: "Magistrate",
       spaceCombat: {
         rolls: 2,
         combat: 5,
@@ -1040,41 +1106,56 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 3,
       },
     },
+    Mech: {
+      name: "Justicar",
+    },
   },
   "Li-Zho": {
     Flagship: {
+      name: "Silence of Stars",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
     Fighter: {
+      name: "Heavy Bomber",
       bombardment: {
         combat: 9,
       },
     },
+    Mech: {
+      name: "Oro-Zhin Elite",
+    },
   },
   Ltokk: {
     Flagship: {
+      name: "Splintering Gale",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
     Cruiser: {
+      name: "Shattered Sky",
       bombardment: {
         combat: 8,
       },
     },
+    Mech: {
+      name: "Megalith",
+    },
   },
   Mirveda: {
     Flagship: {
+      name: "Nexus",
       spaceCombat: {
         rolls: 2,
         combat: 9,
       },
     },
     PDS: {
+      name: "Gauss Cannon",
       bombardment: {
         combat: 6,
       },
@@ -1082,77 +1163,114 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 6,
       },
     },
+    Mech: {
+      name: "Javelin",
+    },
   },
   Mortheus: {
     Flagship: {
+      name: "Particle Sieve",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
+    },
+    Mech: {
+      name: "Duuban",
     },
   },
   "Myko-Mentori": {
     Flagship: {
+      name: "Psyclobea Qarnyx",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
+    },
+    Space_Dock: {
+      name: "Mycelium Ring",
+    },
+    Mech: {
+      name: "Amandia Pholdis",
     },
   },
   Nivyn: {
     Flagship: {
+      name: "Eradica",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
+    },
+    Mech: {
+      name: "Voidflare Warden",
     },
   },
   Olradin: {
     Flagship: {
+      name: "Rallypoint",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
+    Mech: {
+      name: "Exemplar Bonum/Malus",
+    },
   },
   Rhodun: {
     Flagship: {
+      name: "Reckoning",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Templar",
+    },
   },
   RohDhna: {
     Flagship: {
+      name: "Ky'vir",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
     War_Sun: {
+      name: "Terrafactory",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
+    Mech: {
+      name: "Autofabricator",
+    },
   },
   Tnelis: {
     Flagship: {
+      name: "Principia Aneris",
       spaceCombat: {
         rolls: 4,
         combat: 9,
       },
     },
     Destroyer: {
+      name: "Blockade Runner",
       antiFighterBarrage: {
         rolls: 3,
         combat: 9,
       },
     },
+    Mech: {
+      name: "Daedalon",
+    },
   },
   Vaden: {
     Flagship: {
+      name: "Aurum Vadra",
       bombardment: {
         rolls: 2,
         combat: 5,
@@ -1162,23 +1280,35 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 7,
       },
     },
+    Mech: {
+      name: "Collector",
+    },
   },
   Vaylerian: {
     Flagship: {
+      name: "Lost Cause",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Cruiser: {
+      name: "Raider",
+    },
+    Mech: {
+      name: "Eclipse",
+    },
   },
   Veldyr: {
     Flagship: {
+      name: "Richtyrian",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
     Dreadnought: {
+      name: "Lancer Dreadnought",
       bombardment: {
         combat: 5,
       },
@@ -1186,9 +1316,13 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 8,
       },
     },
+    Mech: {
+      name: "Aurora Stormcaller",
+    },
   },
   Zelian: {
     Flagship: {
+      name: "World-Cracker",
       antiFighterBarrage: {
         combat: 5,
       },
@@ -1200,13 +1334,18 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
       },
     },
     Infantry: {
+      name: "Impactor",
       bombardment: {
         combat: 9,
       },
     },
+    Mech: {
+      name: "Collider",
+    },
   },
   Bentor: {
     Flagship: {
+      name: "Wayfinder",
       antiFighterBarrage: {
         rolls: 2,
         combat: 9,
@@ -1221,9 +1360,13 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 9,
       },
     },
+    Mech: {
+      name: "Auctioneer",
+    },
   },
   Cheiran: {
     Flagship: {
+      name: "Lithodax",
       antiFighterBarrage: {
         rolls: 2,
         combat: 7,
@@ -1234,30 +1377,41 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
       },
     },
     Dreadnought: {
+      name: "Chitin Hulk",
       totalUnits: 7,
     },
     Mech: {
+      name: "Nauplius",
       totalUnits: 5,
     },
   },
   Edyn: {
     Flagship: {
+      name: "Kaliburn",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
+    },
+    Mech: {
+      name: "Rune Bearer",
     },
   },
   Ghoti: {
     Flagship: {
+      name: "All Mother",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Tioleombp",
+    },
   },
   Gledge: {
     Flagship: {
+      name: "Beg Bersha",
       bombardment: {
         combat: 7,
       },
@@ -1265,22 +1419,34 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
         combat: 7,
       },
     },
+    PDS: {
+      name: "Orion Platform",
+    },
+    Mech: {
+      name: "Exodriller",
+    },
   },
   Kjalengard: {
     Flagship: {
+      name: "Hulgade’s Hammer",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
     Carrier: {
+      name: "Star Dragon",
       spaceCombat: {
         combat: 8,
       },
     },
+    Mech: {
+      name: "Skald",
+    },
   },
   Kolume: {
     Flagship: {
+      name: "Halberd",
       spaceCannon: {
         combat: 7,
       },
@@ -1290,6 +1456,7 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
       },
     },
     Mech: {
+      name: "Rook",
       spaceCannon: {
         rolls: 2,
         combat: 8,
@@ -1298,18 +1465,26 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
   },
   Kyro: {
     Flagship: {
+      name: "Auriga",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Pustule",
+    },
   },
   Lanefir: {
     Flagship: {
+      name: "Memory of Dusk",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
+    },
+    Mech: {
+      name: "Troubadour",
     },
   },
   Nokar: {
@@ -1339,6 +1514,7 @@ export const FACTION_UNIT_COMBAT_DETAILS: Record<
       },
     },
     Destroyer: {
+      name: "Sabre",
       spaceCombat: {
         combat: 8,
       },
@@ -1433,6 +1609,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
 > = {
   "Aegis II": {
     Dreadnought: {
+      name: "Aegis II",
       spaceCombat: {
         combat: 4,
       },
@@ -1440,6 +1617,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Trade Port II": {
     Space_Dock: {
+      name: "Trade Port II",
       antiFighterBarrage: {
         combat: 6,
         rolls: 2,
@@ -1448,6 +1626,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Unholy Abomination II": {
     Infantry: {
+      name: "Unholy Abomination II",
       groundCombat: {
         combat: 4,
       },
@@ -1455,6 +1634,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Corsair II": {
     Fighter: {
+      name: "Corsair II",
       antiFighterBarrage: {
         combat: 8,
       },
@@ -1462,6 +1642,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Heavy Bomber II": {
     Fighter: {
+      name: "Heavy Bomber II",
       bombardment: {
         combat: 8,
       },
@@ -1469,6 +1650,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Shattered Sky II": {
     Cruiser: {
+      name: "Shattered Sky II",
       bombardment: {
         combat: 6,
       },
@@ -1476,6 +1658,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Gauss Cannon II": {
     PDS: {
+      name: "Gauss Cannon II",
       bombardment: {
         combat: 4,
       },
@@ -1486,6 +1669,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Voidflare Warden II": {
     Mech: {
+      name: "Voidflare Warden II",
       groundCombat: {
         combat: 4,
       },
@@ -1493,6 +1677,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Terrafactory II": {
     War_Sun: {
+      name: "Terrafactory II",
       bombardment: {
         rolls: 3,
         combat: 3,
@@ -1505,6 +1690,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Blockade Runner II": {
     Destroyer: {
+      name: "Blockade Runner II",
       antiFighterBarrage: {
         rolls: 4,
         combat: 6,
@@ -1512,10 +1698,13 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
     },
   },
   "Raider II": {
-    Cruiser: {},
+    Cruiser: {
+      name: "Raider II",
+    },
   },
   "Lancer Dreadnought II": {
     Dreadnought: {
+      name: "Lancer Dreadnought II",
       bombardment: {
         combat: 5,
       },
@@ -1526,6 +1715,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Impactor II": {
     Infantry: {
+      name: "Impactor II",
       bombardment: {
         combat: 8,
       },
@@ -1533,6 +1723,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Star Dragon II": {
     Carrier: {
+      name: "Star Dragon II",
       spaceCombat: {
         combat: 7,
       },
@@ -1540,6 +1731,7 @@ export const DISCORDANT_STARS_FACTION_UNIT_COMBAT: Record<
   },
   "Sabre II": {
     Destroyer: {
+      name: "Sabre II",
       spaceCombat: {
         combat: 7,
       },
@@ -1636,7 +1828,11 @@ export const FACTION_UPGRADE_UNIT_COMBAT_DETAILS: Record<
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Corsair II"],
   },
   "Free-Systems": {},
-  Ghemina: {},
+  Ghemina: {
+    Carrier: {
+      name: "Combat Transport II",
+    },
+  },
   Ilyxum: {},
   Kollecc: {},
   Kortali: {},
@@ -1650,7 +1846,11 @@ export const FACTION_UPGRADE_UNIT_COMBAT_DETAILS: Record<
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Gauss Cannon II"],
   },
   Mortheus: {},
-  "Myko-Mentori": {},
+  "Myko-Mentori": {
+    Space_Dock: {
+      name: "Mycelium Ring II",
+    },
+  },
   Nivyn: {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Voidflare Warden II"],
   },
@@ -1673,10 +1873,18 @@ export const FACTION_UPGRADE_UNIT_COMBAT_DETAILS: Record<
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Impactor II"],
   },
   Bentor: {},
-  Cheiran: {},
+  Cheiran: {
+    Dreadnought: {
+      name: "Chitin Hulk II",
+    },
+  },
   Edyn: {},
   Ghoti: {},
-  Gledge: {},
+  Gledge: {
+    PDS: {
+      name: "Orion Platform II",
+    },
+  },
   Kjalengard: {
     ...DISCORDANT_STARS_FACTION_UNIT_COMBAT["Star Dragon II"],
   },

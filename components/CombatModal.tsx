@@ -1034,7 +1034,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                           [{rollSet}]
                           <CombatStrength>
                             {rollSets[index]?.combatStrength || 1}{" "}
-                            {`(${unitCombats[index]?.[unit].name})`}
+                            {unitCombats[index]?.[unit].name !== undefined &&
+                              `(${unitCombats[index]?.[unit].name})`}
                           </CombatStrength>
                         </RollSet>
                       );
