@@ -18,7 +18,6 @@ import {
   CombatEvalFunc,
   UnitCombatDetailsList,
   FactionExclusiveUnitCombatTechnology,
-  FactionExclusiveTechnology,
 } from "../types";
 import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
@@ -39,7 +38,7 @@ import {
 import SelectableButton from "./SelectableButton";
 import { Header, HeaderButtonContainer, HeaderWrapper } from "./Headers";
 import { AGENDAS, AGENDA_COMBAT } from "../constants/agendas";
-import { UNIT_COMBAT_ABILITIES } from "../constants/units";
+import { FACTION_UNIT_COMBAT_DETAILS } from "../constants/factions";
 import {
   FACTION_EXCLUSIVE_ABILITIES,
   FACTION_EXCLUSIVE_ABILITIES_COMBAT,
@@ -128,6 +127,8 @@ const IconContainer = styled.div`
   width: 50px;
   height: 50px;
   position: relative;
+  display: flex;
+  flex-flow: column;
 `;
 
 const NumUnitsContainer = styled.div`
@@ -135,6 +136,12 @@ const NumUnitsContainer = styled.div`
   bottom: -5px;
   right: 0;
   font-size: 11px;
+`;
+
+const UnitNameContainer = styled.div`
+  font-size: 8px;
+  position: absolute;
+  bottom: -10px;
 `;
 
 const CombatUnitRow = styled.div`
@@ -232,6 +239,8 @@ const UnitOrder: Units[] = [
   "Space_Dock",
   "Mech",
   "Infantry",
+  "Memoria",
+  "Experimental Battlestation",
 ];
 
 const _doroll = (num: number): number[] => {
@@ -510,7 +519,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         }
       });
 
-      const unitCombatAbilities = UNIT_COMBAT_ABILITIES[faction];
+      const unitCombatAbilities = FACTION_UNIT_COMBAT_DETAILS[faction];
 
       if (unitCombatAbilities) {
         const units = Object.keys(unitCombatAbilities) as Units[];
@@ -765,14 +774,13 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
   ]);
 
   const unitCombatAbilities = useMemo(() => {
-    const factionUnitAbilities = UNIT_COMBAT_ABILITIES[faction];
+    const factionUnitAbilities = FACTION_UNIT_COMBAT_DETAILS[faction];
     if (factionUnitAbilities) {
       return Object.keys(factionUnitAbilities) as Units[];
     }
   }, [faction]);
 
-  const [{ isDiscordantStars }] =
-    useDiscordantStarsStateContext();
+  const [{ isDiscordantStars }] = useDiscordantStarsStateContext();
 
   const factionExclusiveTechs = useMemo(() => {
     if (isDiscordantStars) {
@@ -847,7 +855,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 {PROMISSORY_NOTES.map((note) => (
                   <HeaderButtonContainer key={note}>
                     <SelectableButton
-                      highlightColor="orange"
+                      highlightColor="dodgerblue"
                       selected={selectedPromissoryNotes[note]}
                       onClick={() => onPromissoryNoteSelected(note)}
                     >
@@ -886,7 +894,8 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 {unitCombatAbilities &&
                   unitCombatAbilities.map(
                     (unit) =>
-                      UNIT_COMBAT_ABILITIES[faction]?.[unit]?.selectable && (
+                      FACTION_UNIT_COMBAT_DETAILS[faction]?.[unit]
+                        ?.selectable && (
                         <HeaderButtonContainer>
                           <SelectableButton
                             highlightColor="purple"
@@ -898,7 +907,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                               }))
                             }
                           >
-                            {UNIT_COMBAT_ABILITIES[faction]?.[unit]?.name}
+                            {FACTION_UNIT_COMBAT_DETAILS[faction]?.[unit]?.name}
                           </SelectableButton>
                         </HeaderButtonContainer>
                       )
@@ -946,10 +955,15 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
         <Content>
           {activeUnits.map((activeUnit, index) => {
             return activeUnit.map((unit) => {
+              const resolvedFaction =
+                unit === "Experimental Battlestation" || unit === "Memoria"
+                  ? "Neutral"
+                  : faction;
+
               return (
                 <CombatUnitRow key={unit}>
                   <IconContainer>
-                    <IconImage faction={faction} unit={unit} />
+                    <IconImage faction={resolvedFaction} unit={unit} />
                     <NumUnitsContainer>
                       x{localNumUnits[unit]}
                     </NumUnitsContainer>
@@ -1020,7 +1034,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                           [{rollSet}]
                           <CombatStrength>
                             {rollSets[index]?.combatStrength || 1}{" "}
-                            {rollSets[index]?.name && `(${rollSets[0]?.name})`}
+                            {`(${unitCombats[index]?.[unit].name})`}
                           </CombatStrength>
                         </RollSet>
                       );

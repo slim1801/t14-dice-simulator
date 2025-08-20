@@ -17,6 +17,8 @@ export const UNIT_LIST: Units[] = [
   "PDS",
   "Mech",
   "Infantry",
+  "Memoria",
+  "Experimental Battlestation",
 ];
 
 export const UNIT_ABILITIES: CombatType[] = [
@@ -40,6 +42,8 @@ export const EMPTY_COMBAT_STRENGTH: UnitCombat = {
   Space_Dock: {},
   Mech: {},
   Infantry: {},
+  Memoria: {},
+  "Experimental Battlestation": {},
 };
 
 export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
@@ -47,6 +51,7 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     totalUnits: 1,
   },
   War_Sun: {
+    name: "War Sun",
     totalUnits: 2,
     spaceCombat: {
       combat: 3,
@@ -58,6 +63,7 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Dreadnought: {
+    name: "Dreadnought",
     totalUnits: 5,
     spaceCombat: {
       combat: 5,
@@ -67,12 +73,14 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Cruiser: {
+    name: "Cruiser",
     totalUnits: 8,
     spaceCombat: {
       combat: 7,
     },
   },
   Destroyer: {
+    name: "Destroyer",
     totalUnits: 8,
     spaceCombat: {
       combat: 9,
@@ -83,17 +91,20 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Carrier: {
+    name: "Carrier",
     totalUnits: 4,
     spaceCombat: {
       combat: 9,
     },
   },
   Fighter: {
+    name: "Fighter",
     spaceCombat: {
       combat: 9,
     },
   },
   PDS: {
+    name: "PDS",
     totalUnits: 6,
     spaceCannon: {
       combat: 6,
@@ -103,6 +114,7 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Space_Dock: {
+    name: "Space Dock",
     totalUnits: 3,
   },
   Mech: {
@@ -112,25 +124,38 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
     },
   },
   Infantry: {
+    name: "Infantry",
     groundCombat: {
       combat: 8,
+    },
+  },
+  Memoria: {
+    name: "Memoria",
+    totalUnits: 1,
+    spaceCombat: {
+      combat: 7,
+      rolls: 2,
+    },
+    antiFighterBarrage: {
+      combat: 8,
+      rolls: 3,
+    },
+  },
+  "Experimental Battlestation": {
+    name: "Experimental Battlestation",
+    totalUnits: 1,
+    spaceCannon: {
+      combat: 5,
+      rolls: 3,
     },
   },
 };
 
 export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
   Flagship: {},
-  War_Sun: {
-    spaceCombat: {
-      combat: 3,
-      rolls: 3,
-    },
-    bombardment: {
-      rolls: 3,
-      combat: 3,
-    },
-  },
+  War_Sun: {},
   Dreadnought: {
+    name: "Dreadnought II",
     spaceCombat: {
       combat: 5,
     },
@@ -139,11 +164,13 @@ export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
     },
   },
   Cruiser: {
+    name: "Cruiser II",
     spaceCombat: {
       combat: 6,
     },
   },
   Destroyer: {
+    name: "Destroyer II",
     spaceCombat: {
       combat: 8,
     },
@@ -153,16 +180,19 @@ export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
     },
   },
   Carrier: {
+    name: "Carrier II",
     spaceCombat: {
       combat: 9,
     },
   },
   Fighter: {
+    name: "Fighter II",
     spaceCombat: {
       combat: 8,
     },
   },
   PDS: {
+    name: "PDS II",
     spaceCannon: {
       combat: 5,
     },
@@ -170,287 +200,27 @@ export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
       combat: 5,
     },
   },
-  Space_Dock: {},
+  Space_Dock: {
+    name: "Space Dock II",
+  },
   Mech: {},
   Infantry: {
+    name: "Infantry II",
     groundCombat: {
       combat: 7,
     },
   },
-};
-
-export const UNIT_COMBAT_ABILITIES: UnitCombatAbilities = {
-  Arborec: null,
-  Barony: null,
-  Saar: null,
-  Muaat: null,
-  Hacan: null,
-  Sol: null,
-  Ghosts: null,
-  L1Z1X: null,
-  Mentak: null,
-  Naalu: {
-    Flagship: {
-      name: "Matriarch",
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat?.Fighter) {
-          return {
-            Fighter: {
-              groundCombat: { ...unitCombat.Fighter.spaceCombat },
-            },
-          };
-        }
-        return null;
-      },
+  Memoria: {
+    name: "Memoria II",
+    totalUnits: 1,
+    spaceCombat: {
+      combat: 5,
+      rolls: 2,
+    },
+    antiFighterBarrage: {
+      combat: 5,
+      rolls: 3,
     },
   },
-  Nekro: {
-    Flagship: {
-      name: "The Alastor",
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          return {
-            Mech: {
-              spaceCombat: { ...unitCombat.Mech.groundCombat },
-            },
-            Infantry: {
-              spaceCombat: { ...unitCombat.Infantry.groundCombat },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
-  Sardakk: {
-    Flagship: {
-      name: "C'Morran N'orr",
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          return {
-            ...(unitCombat.Flagship.name !== "C'Morran N'orr" && {
-              Flagship: {
-                spaceCombat: {
-                  combatMod: [1],
-                },
-              },
-            }),
-            War_Sun: {
-              spaceCombat: {
-                combatMod: [1],
-              },
-            },
-            Dreadnought: {
-              spaceCombat: {
-                combatMod: [1],
-              },
-            },
-            Cruiser: {
-              spaceCombat: {
-                combatMod: [1],
-              },
-            },
-            Destroyer: {
-              spaceCombat: {
-                combatMod: [1],
-              },
-            },
-            Carrier: {
-              spaceCombat: {
-                combatMod: [1],
-              },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
-  "Jol-Nar": {
-    Mech: {
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          return {
-            Infantry: {
-              groundCombat: {
-                combatMod: [1],
-              },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
-  Winnu: null,
-  Xxcha: null,
-  Yin: null,
-  Yssaril: null,
-  Argent: null,
-  Empyrean: null,
-  Mahact: {
-    Flagship: {
-      name: "Arvicon Rex",
-      selectable: true,
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          return {
-            Flagship: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            War_Sun: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Dreadnought: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Cruiser: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Destroyer: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Carrier: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Fighter: {
-              spaceCombat: {
-                combatMod: [2],
-              },
-            },
-            Mech: {
-              groundCombat: {
-                combatMod: [2],
-              },
-            },
-            Infantry: {
-              groundCombat: {
-                combatMod: [2],
-              },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
-  NaazRokha: {
-    Flagship: {
-      name: "Visz El Vir",
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number,
-        numUnits?: NumUnits
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          const extraRolls = numUnits?.Mech || 0;
-          return {
-            Mech: {
-              spaceCombat: {
-                rollMod: [extraRolls],
-              },
-              groundCombat: {
-                rollMod: [extraRolls],
-              },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
-  Nomad: null,
-  Titans: null,
-  Cabal: null,
-
-  // Discordant Stars
-  Axis: null,
-  Celdauri: null,
-  Cymiae: null,
-  "Dih-Mohn": null,
-  Florzen: null,
-  "Free-Systems": null,
-  Ghemina: null,
-  Ilyxum: null,
-  Kollecc: null,
-  Kortali: null,
-  "Li-Zho": null,
-  Ltokk: null,
-  Mirveda: null,
-  Mortheus: null,
-  "Myko-Mentori": null,
-  Nivyn: null,
-  Olradin: null,
-  Rhodun: null,
-  RohDhna: null,
-  Tnelis: null,
-  Vaden: null,
-  Vaylerian: null,
-  Veldyr: null,
-  Zelian: null,
-  Bentor: null,
-  Cheiran: null,
-  Edyn: null,
-  Ghoti: null,
-  Gledge: null,
-  Kjalengard: null,
-  Kolume: null,
-  Kyro: null,
-  Lanefir: null,
-  Nokar: {
-    Flagship: {
-      name: "Annah Regia",
-      combatEvalFunc: (
-        allUnitCombats?: UnitCombat[],
-        unitCombatIndex?: number,
-        numUnits?: NumUnits
-      ) => {
-        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
-        if (unitCombat) {
-          const numDestroyers = numUnits?.Destroyer || 0;
-          return {
-            Flagship: {
-              spaceCombat: {
-                combatMod: [numDestroyers],
-              },
-            },
-          };
-        }
-        return null;
-      },
-    },
-  },
+  "Experimental Battlestation": {},
 };

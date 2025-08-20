@@ -11,7 +11,9 @@ export type Units =
   | "PDS"
   | "Space_Dock"
   | "Mech"
-  | "Infantry";
+  | "Infantry"
+  | "Memoria"
+  | "Experimental Battlestation";
 
 export type BasePokFactions =
   | "Arborec"
@@ -41,6 +43,10 @@ export type BasePokFactions =
 
 export type Factions = BasePokFactions | DiscordantStarsFactions;
 
+export interface UnitDetails {
+  name?: string;
+}
+
 export interface CombatDetails {
   rolls?: number;
   rollMod?: number[];
@@ -51,8 +57,6 @@ export interface CombatDetails {
   numUnitsMod?: number[];
 
   name?: string;
-  selectable?: boolean;
-  combatEvalFunc?: CombatEvalFunc;
   additionalHitsFunc?: AdditionalCombatFunc;
 }
 
@@ -69,6 +73,9 @@ export type Combat = {
 } & {
   name?: string;
   totalUnits?: number;
+
+  selectable?: boolean;
+  combatEvalFunc?: CombatEvalFunc;
 };
 
 export interface UnitHit {
@@ -110,7 +117,15 @@ export type UnitHits = Record<Units, UnitHit[][]>;
 export type TechnologyCombat = Record<CombatTechnology, UnitCombat>;
 export type UnitCombatDetailsList = UnitCombatDetails[];
 
-export type CombatTechnology = "Antimass Deflectors" | "Plasma Scoring" | "Supercharge";
+export type FactionUnitDetails = Record<
+  Factions,
+  Partial<Record<Units, UnitDetails>> | null
+>;
+
+export type CombatTechnology =
+  | "Antimass Deflectors"
+  | "Plasma Scoring"
+  | "Supercharge";
 export type CombatActionCards =
   | "Bunker"
   | "Fighter Prototype"

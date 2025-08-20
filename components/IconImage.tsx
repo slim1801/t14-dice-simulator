@@ -4,12 +4,12 @@ import { FACTION_COLORS } from "../constants/factions";
 import { Factions, Units } from "../types";
 
 interface IconImageProps {
-  faction: Factions;
+  faction: Factions | "Neutral";
   unit: Units;
 }
 
 interface IconImageComponentProps {
-  faction: Factions;
+  faction: Factions | "Neutral";
 }
 
 const IconImageComponent = styled(Image)<IconImageComponentProps>`
@@ -20,11 +20,18 @@ const IconImage: React.FunctionComponent<IconImageProps> = ({
   faction,
   unit,
 }) => {
+  let resolvedUnit = unit;
+  if (unit === "Memoria") {
+    resolvedUnit = "Flagship";
+  }
+  if (unit === "Experimental Battlestation") {
+    resolvedUnit = "Space_Dock";
+  }
   return (
     <IconImageComponent
       alt={unit}
       faction={faction}
-      src={`/images/units/${unit}.png`}
+      src={`/images/units/${resolvedUnit}.png`}
       layout="fill"
       objectFit="contain"
     />

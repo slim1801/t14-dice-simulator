@@ -6,7 +6,11 @@ import {
   DSFactionExclusiveUnitCombatTechnology,
   FactionExclusiveUnitCombatTechnology,
   Factions,
+  FactionUnitDetails,
+  NumUnits,
   UnitCombat,
+  UnitCombatAbilities,
+  Units,
 } from "../types";
 import { combatModFunc } from "../utils/combat";
 import { ALL_DISCORDANT_FACTIONS } from "./discordantStars/factions";
@@ -44,10 +48,11 @@ export const ALL_FACTIONS: Factions[] = [
 ];
 
 type FactionType = {
-  [key in Factions]: string;
+  [key in Factions | "Neutral"]: string;
 };
 
 export const FACTION_NAMES: FactionType = {
+  Neutral: "Neutral",
   Arborec: "The Arborec",
   Barony: "The Barony of Letnev",
   Saar: "The Clan of Saar",
@@ -110,6 +115,7 @@ export const FACTION_NAMES: FactionType = {
 };
 
 export const FACTION_COLORS: FactionType = {
+  Neutral: "grayscale(100%)",
   Arborec:
     "grayscale(100%) sepia(52%) saturate(341%) hue-rotate(42deg) brightness(90%)",
   Barony:
@@ -285,17 +291,28 @@ export const BESPOKE_FACTION_COMBAT: Partial<
   },
 };
 
-export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
+export const FACTION_UNIT_COMBAT_DETAILS: Record<
+  Factions,
+  Partial<UnitCombat>
+> = {
   Arborec: {
     Flagship: {
+      name: "Duha Menaimon",
       spaceCombat: {
         rolls: 2,
         combat: 7,
       },
     },
+    Mech: {
+      name: "Letani Behemoth",
+    },
+    Infantry: {
+      name: "Letani Warrior",
+    },
   },
   Barony: {
     Flagship: {
+      name: "Arc Secundus",
       spaceCombat: {
         combat: 5,
         rolls: 2,
@@ -305,9 +322,13 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 3,
       },
     },
+    Mech: {
+      name: "Dunlain Reaper",
+    },
   },
   Saar: {
     Flagship: {
+      name: "Son of Ragh",
       spaceCombat: {
         combat: 5,
         rolls: 2,
@@ -317,15 +338,23 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 4,
       },
     },
+    Mech: {
+      name: "Scavenger Zeta",
+    },
+    Space_Dock: {
+      name: "Floating Factory",
+    },
   },
   Muaat: {
     Flagship: {
+      name: "The Inferno",
       spaceCombat: {
         rolls: 2,
         combat: 5,
       },
     },
     War_Sun: {
+      name: "Prototype War Sun I",
       spaceCombat: {
         combat: 3,
         rolls: 3,
@@ -335,28 +364,38 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 3,
       },
     },
+    Mech: {
+      name: "Ember Colossus",
+    },
   },
   Hacan: {
     Flagship: {
+      name: "Wrath of Kenara",
       spaceCombat: {
         combat: 7,
         rolls: 2,
       },
     },
+    Mech: {
+      name: "Pride of Kenara",
+    },
   },
   Sol: {
     Flagship: {
+      name: "Genesis",
       spaceCombat: {
         combat: 5,
         rolls: 2,
       },
     },
     Infantry: {
+      name: "Spec Ops",
       groundCombat: {
         combat: 7,
       },
     },
     Carrier: {
+      name: "Advanced Carrier",
       spaceCombat: {
         combat: 9,
       },
@@ -364,19 +403,28 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Ghosts: {
     Flagship: {
+      name: "Hil Colish",
       spaceCombat: {
         combat: 5,
       },
     },
+    Mech: {
+      name: "Icarus Drive",
+    },
   },
   L1Z1X: {
     Flagship: {
+      name: "[0.0.1]",
       spaceCombat: {
         combat: 5,
         rolls: 2,
       },
     },
+    Dreadnought: {
+      name: "Super-Dreadnought I",
+    },
     Mech: {
+      name: "Annihilator",
       bombardment: {
         combat: 8,
       },
@@ -384,31 +432,75 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Mentak: {
     Flagship: {
+      name: "Fourth Moon",
       spaceCombat: {
         combat: 7,
         rolls: 2,
       },
     },
+    Mech: {
+      name: "Moll Terminus",
+    },
   },
   Naalu: {
     Flagship: {
+      name: "Matriarch",
       spaceCombat: {
         combat: 9,
         rolls: 2,
       },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat?.Fighter) {
+          return {
+            Fighter: {
+              groundCombat: { ...unitCombat.Fighter.spaceCombat },
+            },
+          };
+        }
+        return null;
+      },
     },
     Fighter: {
+      name: "Hybrid Crystal Fighter",
       spaceCombat: {
         combat: 8,
       },
     },
+    Mech: {
+      name: "Iconoclast",
+    },
   },
   Nekro: {
     Flagship: {
+      name: "The Alastor",
       spaceCombat: {
         combat: 9,
         rolls: 2,
       },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          return {
+            Mech: {
+              spaceCombat: { ...unitCombat.Mech.groundCombat },
+            },
+            Infantry: {
+              spaceCombat: { ...unitCombat.Infantry.groundCombat },
+            },
+          };
+        }
+        return null;
+      },
+    },
+    Mech: {
+      name: "Mordred",
     },
   },
   Sardakk: {
@@ -419,8 +511,52 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 2,
         combatMod: [1],
       },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          return {
+            ...(unitCombat.Flagship.name !== "C'Morran N'orr" && {
+              Flagship: {
+                spaceCombat: {
+                  combatMod: [1],
+                },
+              },
+            }),
+            War_Sun: {
+              spaceCombat: {
+                combatMod: [1],
+              },
+            },
+            Dreadnought: {
+              spaceCombat: {
+                combatMod: [1],
+              },
+            },
+            Cruiser: {
+              spaceCombat: {
+                combatMod: [1],
+              },
+            },
+            Destroyer: {
+              spaceCombat: {
+                combatMod: [1],
+              },
+            },
+            Carrier: {
+              spaceCombat: {
+                combatMod: [1],
+              },
+            },
+          };
+        }
+        return null;
+      },
     },
     Dreadnought: {
+      name: "Exotrireme",
       spaceCombat: {
         combatMod: [1],
       },
@@ -455,6 +591,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       },
     },
     Mech: {
+      name: "Valkyrie Exoskeleton",
       groundCombat: {
         combatMod: [1],
       },
@@ -462,6 +599,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   "Jol-Nar": {
     Flagship: {
+      name: "J.N.S. Hylarim",
       spaceCombat: {
         combat: 6,
         rolls: 2,
@@ -507,20 +645,42 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       },
     },
     Mech: {
+      name: "Shield Paling",
       groundCombat: {
         combatMod: [-1],
+      },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          return {
+            Infantry: {
+              groundCombat: {
+                combatMod: [1],
+              },
+            },
+          };
+        }
+        return null;
       },
     },
   },
   Winnu: {
     Flagship: {
+      name: "Salai Sai Corian",
       spaceCombat: {
         combat: 7,
       },
     },
+    Mech: {
+      name: "Reclaimer",
+    },
   },
   Xxcha: {
     Flagship: {
+      name: "Loncara Ssodu",
       spaceCombat: {
         combat: 7,
         rolls: 2,
@@ -531,6 +691,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       },
     },
     Mech: {
+      name: "Indomitus",
       spaceCannon: {
         combat: 8,
       },
@@ -538,28 +699,38 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Yin: {
     Flagship: {
+      name: "Van Hauge",
       spaceCombat: {
         combat: 9,
         rolls: 2,
       },
     },
+    Mech: {
+      name: "Moyin's Ashes",
+    },
   },
   Yssaril: {
     Flagship: {
+      name: "Y'sia Y'ssrila",
       spaceCombat: {
         combat: 5,
         rolls: 2,
       },
     },
+    Mech: {
+      name: "Blackshade Infiltrator",
+    },
   },
   Argent: {
     Flagship: {
+      name: "Quetzecoatl",
       spaceCombat: {
         combat: 7,
         rolls: 2,
       },
     },
     Destroyer: {
+      name: "Strike Wing Alpha",
       spaceCombat: {
         combat: 8,
       },
@@ -568,31 +739,125 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 2,
       },
     },
+    Mech: {
+      name: "Aerie Sentinel",
+    },
   },
   Empyrean: {
     Flagship: {
+      name: "Dynamo",
       spaceCombat: {
         combat: 5,
-        rolls: 2,
-      },
-    },
-  },
-  Mahact: {
-    Flagship: {
-      spaceCombat: {
-        combat: 5,
-        rolls: 2,
-      },
-    },
-  },
-  NaazRokha: {
-    Flagship: {
-      spaceCombat: {
-        combat: 9,
         rolls: 2,
       },
     },
     Mech: {
+      name: "Watcher",
+    },
+  },
+  Mahact: {
+    Flagship: {
+      name: "Arvicon Rex",
+      selectable: true,
+      spaceCombat: {
+        combat: 5,
+        rolls: 2,
+      },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          return {
+            Flagship: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            War_Sun: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Dreadnought: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Cruiser: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Destroyer: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Carrier: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Fighter: {
+              spaceCombat: {
+                combatMod: [2],
+              },
+            },
+            Mech: {
+              groundCombat: {
+                combatMod: [2],
+              },
+            },
+            Infantry: {
+              groundCombat: {
+                combatMod: [2],
+              },
+            },
+          };
+        }
+        return null;
+      },
+    },
+    Infantry: {
+      name: "Crimson Legionnaire",
+    },
+    Mech: {
+      name: "Starlancer",
+    },
+  },
+  NaazRokha: {
+    Flagship: {
+      name: "Visz El Vir",
+      spaceCombat: {
+        combat: 9,
+        rolls: 2,
+      },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number,
+        numUnits?: NumUnits
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          const extraRolls = numUnits?.Mech || 0;
+          return {
+            Mech: {
+              spaceCombat: {
+                rollMod: [extraRolls],
+              },
+              groundCombat: {
+                rollMod: [extraRolls],
+              },
+            },
+          };
+        }
+        return null;
+      },
+    },
+    Mech: {
+      name: "Eidolon",
       spaceCombat: {
         combat: 8,
         rolls: 2,
@@ -605,6 +870,7 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Nomad: {
     Flagship: {
+      name: "Memoria",
       spaceCombat: {
         combat: 7,
         rolls: 2,
@@ -614,20 +880,26 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         rolls: 3,
       },
     },
+    Mech: {
+      name: "Quantum Manipulator",
+    },
   },
   Titans: {
     Flagship: {
+      name: "Ouranos",
       spaceCombat: {
         combat: 7,
         rolls: 2,
       },
     },
     Cruiser: {
+      name: "Saturn Engine",
       spaceCombat: {
         combat: 7,
       },
     },
     PDS: {
+      name: "Hel Titan",
       spaceCannon: {
         combat: 6,
       },
@@ -638,9 +910,13 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
         combat: 7,
       },
     },
+    Mech: {
+      name: "Hecatoncheires",
+    },
   },
   Cabal: {
     Flagship: {
+      name: "The Terror Between",
       spaceCombat: {
         combat: 5,
         rolls: 2,
@@ -648,6 +924,12 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
       bombardment: {
         combat: 5,
       },
+    },
+    Space_Dock: {
+      name: "Dimensional Tear",
+    },
+    Mech: {
+      name: "Reanimator",
     },
   },
 
@@ -1032,9 +1314,28 @@ export const FACTION_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Nokar: {
     Flagship: {
+      name: "Annah Regia",
       spaceCombat: {
         rolls: 2,
         combat: 9,
+      },
+      combatEvalFunc: (
+        allUnitCombats?: UnitCombat[],
+        unitCombatIndex?: number,
+        numUnits?: NumUnits
+      ) => {
+        const unitCombat = allUnitCombats?.[unitCombatIndex || 0];
+        if (unitCombat) {
+          const numDestroyers = numUnits?.Destroyer || 0;
+          return {
+            Flagship: {
+              spaceCombat: {
+                combatMod: [numDestroyers],
+              },
+            },
+          };
+        }
+        return null;
       },
     },
     Destroyer: {
@@ -1051,6 +1352,7 @@ export const FACTION_UNIT_COMBAT: Record<
 > = {
   "Spec Ops II": {
     Infantry: {
+      name: "Spec Ops II",
       groundCombat: {
         combat: 6,
       },
@@ -1058,6 +1360,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Super-Dreadnought II": {
     Dreadnought: {
+      name: "Super-Dreadnought II",
       spaceCombat: {
         combat: 4,
       },
@@ -1068,6 +1371,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Hybrid Crystal Fighter II": {
     Fighter: {
+      name: "Hybrid Crystal Fighter II",
       spaceCombat: {
         combat: 7,
       },
@@ -1075,6 +1379,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Exotrireme II": {
     Dreadnought: {
+      name: "Exotrireme II",
       bombardment: {
         combat: 4,
         rolls: 2,
@@ -1083,6 +1388,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Strike Wing Alpha II": {
     Destroyer: {
+      name: "Strike Wing Alpha II",
       spaceCombat: {
         combat: 7,
       },
@@ -1094,6 +1400,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Memoria II": {
     Flagship: {
+      name: "Memoria II",
       spaceCombat: {
         combat: 5,
         rolls: 2,
@@ -1106,6 +1413,7 @@ export const FACTION_UNIT_COMBAT: Record<
   },
   "Hel Titan II": {
     PDS: {
+      name: "Hel Titan II",
       spaceCannon: {
         combat: 5,
       },
@@ -1243,12 +1551,20 @@ export const FACTION_TECH_COMBAT: Record<string, CombatEvalFunc> = {
   Supercharge: combatModFunc([1]),
 };
 
-export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
-  Arborec: {},
+export const FACTION_UPGRADE_UNIT_COMBAT_DETAILS: Record<
+  Factions,
+  Partial<UnitCombat>
+> = {
+  Arborec: {
+    Infantry: {
+      name: "Letani Warrior II",
+    },
+  },
   Barony: {},
   Saar: {},
   Muaat: {
     War_Sun: {
+      name: "Prototype War Sun II",
       spaceCombat: {
         combat: 3,
         rolls: 3,
@@ -1262,6 +1578,7 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   Hacan: {},
   Sol: {
     Carrier: {
+      name: "Advanced Carrier II",
       spaceCombat: {
         combat: 9,
       },
@@ -1278,20 +1595,9 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
   },
   Nekro: {},
   Sardakk: {
-    War_Sun: {
-      spaceCombat: {
-        combatMod: [1],
-      },
-    },
     ...FACTION_UNIT_COMBAT["Exotrireme II"],
   },
-  "Jol-Nar": {
-    War_Sun: {
-      spaceCombat: {
-        combatMod: [-1],
-      },
-    },
-  },
+  "Jol-Nar": {},
   Winnu: {},
   Xxcha: {},
   Yin: {},
@@ -1306,17 +1612,13 @@ export const FACTION_UPGRADE_COMBAT: Record<Factions, Partial<UnitCombat>> = {
     ...FACTION_UNIT_COMBAT["Memoria II"],
   },
   Titans: {
-    PDS: {
-      spaceCannon: {
-        combat: 5,
-      },
-      groundSpaceCannon: {
-        combat: 5,
-      },
-      groundCombat: {
+    Cruiser: {
+      name: "Saturn Engine II",
+      spaceCombat: {
         combat: 6,
       },
     },
+    ...FACTION_UNIT_COMBAT["Hel Titan II"],
   },
   Cabal: {},
   // Discordant Stars

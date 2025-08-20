@@ -1,8 +1,8 @@
 import {
   BESPOKE_FACTION_COMBAT,
-  FACTION_COMBAT,
+  FACTION_UNIT_COMBAT_DETAILS,
   FACTION_NAMES,
-  FACTION_UPGRADE_COMBAT,
+  FACTION_UPGRADE_UNIT_COMBAT_DETAILS,
 } from "../constants/factions";
 import deepmerge from "deepmerge";
 import Image from "next/image";
@@ -16,27 +16,21 @@ import { StylelessButton } from "./StylelessButton";
 import {
   DEFAULT_UNIT_COMBAT_STRENGTH,
   DEFAULT_UNIT_UPGRADE_COMBAT,
-  EMPTY_COMBAT_STRENGTH,
   UNIT_ABILITIES,
   UNIT_LIST,
 } from "../constants/units";
+
 import {
   NumUnits,
   UnitUpgraded,
   Factions,
   Units,
   UnitCombat,
-  AdditionalCombatUnit,
   UnitCombatDetailsList,
   BespokeUnitCombat,
 } from "../types";
 import { FactionBackgroundImage } from "./FactionBackgroundImage";
-import SelectableButton from "./SelectableButton";
-import { HeaderButtonContainer, HeaderWrapper } from "./Headers";
-import {
-  ADDITIONAL_UNIT_COMBAT,
-  FACTION_ADDITIONAL_COMBAT_UNITS,
-} from "../constants/additionalCombat";
+import { ADDITIONAL_UNIT_COMBAT } from "../constants/additionalCombat";
 import { calculateCombat, calculateRolls } from "../utils/combat";
 
 interface FactionProps {
@@ -88,6 +82,11 @@ const FactionHeading = styled.h1`
   font-size: 1.5em;
 `;
 
+const UnitName = styled.p`
+  margin-left: 15px;
+  font-size: 0.7em;
+`;
+
 const Header = styled.div`
   display: flex;
   padding-right: 20px;
@@ -104,6 +103,13 @@ const ClearButton = styled(StylelessButton)`
   text-decoration: underline;
 `;
 
+const Divider = styled.div`
+  height: 2px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+`;
+
 const DEFAULT_NUM_UNITS = {
   Flagship: 0,
   War_Sun: 0,
@@ -116,6 +122,8 @@ const DEFAULT_NUM_UNITS = {
   Space_Dock: 0,
   Mech: 0,
   Infantry: 0,
+  Memoria: 0,
+  "Experimental Battlestation": 0,
 };
 
 const DEFAULT_UNIT_UPGRADES = {
@@ -130,6 +138,8 @@ const DEFAULT_UNIT_UPGRADES = {
   Space_Dock: false,
   Mech: false,
   Infantry: false,
+  Memoria: false,
+  "Experimental Battlestation": false,
 };
 
 const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
@@ -163,7 +173,10 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
 
   const factionUpgrade = useMemo(
     () =>
-      deepmerge(DEFAULT_UNIT_UPGRADE_COMBAT, FACTION_UPGRADE_COMBAT[faction]),
+      deepmerge(
+        DEFAULT_UNIT_UPGRADE_COMBAT,
+        FACTION_UPGRADE_UNIT_COMBAT_DETAILS[faction]
+      ),
     [faction]
   );
 
@@ -211,8 +224,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
   }, [bespokeCombat]);
 
   const combat: UnitCombat = useMemo(() => {
-    let calcCombat = FACTION_COMBAT[faction];
-    console.log(calculatedBespokeCombat);
+    let calcCombat = FACTION_UNIT_COMBAT_DETAILS[faction];
     if (calculatedBespokeCombat) {
       calcCombat = deepmerge(calcCombat, calculatedBespokeCombat);
     }
@@ -231,35 +243,11 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
     return initialCombat;
   }, [upgraded, factionUpgrade, calculatedBespokeCombat, faction]);
 
-  const defaultSelectedAdditionalUnits = useMemo(() => {
-    return FACTION_ADDITIONAL_COMBAT_UNITS[faction].reduce(
-      (acc, additionalCombat) => {
-        acc[additionalCombat] = false;
-        return acc;
-      },
-      {} as Record<AdditionalCombatUnit, boolean>
-    );
-  }, [faction]);
-
-  const [selectedAdditionalCombatUnit, setSelectedAdditionalCombatUnit] =
-    useState(defaultSelectedAdditionalUnits);
-
-  const onAdditionalCombatUnitSelected = useCallback(
-    (addCombat: AdditionalCombatUnit) => {
-      setSelectedAdditionalCombatUnit((prevState) => ({
-        ...prevState,
-        [addCombat]: !prevState[addCombat],
-      }));
-    },
-    []
-  );
-
   const [showCombatModal, setShowCombatModal] = useState(false);
 
   const onClear = useCallback(() => {
     setNumUnits({ ...DEFAULT_NUM_UNITS });
-    setSelectedAdditionalCombatUnit(defaultSelectedAdditionalUnits);
-  }, [defaultSelectedAdditionalUnits]);
+  }, []);
 
   const unitCombatList = useMemo(() => {
     const unitCombats: UnitCombatDetailsList = [
@@ -268,33 +256,9 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
         numUnits,
       },
     ];
-    const additionalCombatUnits = Object.keys(
-      selectedAdditionalCombatUnit
-    ) as AdditionalCombatUnit[];
-
-    additionalCombatUnits.forEach((combatUnit) => {
-      if (selectedAdditionalCombatUnit[combatUnit]) {
-        const additionalCombat = ADDITIONAL_UNIT_COMBAT[combatUnit];
-        if (additionalCombat) {
-          const unitCombat = {
-            ...EMPTY_COMBAT_STRENGTH,
-            ...additionalCombat,
-          };
-          const unitCombatKeys = Object.keys(unitCombat) as Units[];
-          const additionalNumUnits = unitCombatKeys.reduce((acc, unitKey) => {
-            acc[unitKey] = Object.keys(unitCombat[unitKey]).length > 0 ? 1 : 0;
-            return acc;
-          }, {} as NumUnits);
-          unitCombats.push({
-            unitCombat,
-            numUnits: additionalNumUnits,
-          });
-        }
-      }
-    });
 
     return unitCombats;
-  }, [combat, numUnits, selectedAdditionalCombatUnit]);
+  }, [combat, numUnits]);
 
   const onBespokeCombatChanged = (unit: Units) => (value: number) => {
     setBespokeCombat((prevValue) => {
@@ -306,6 +270,11 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
         },
       };
     });
+  };
+
+  const unitName = (unit: Units, defaultName: string) => {
+    const name = FACTION_UNIT_COMBAT_DETAILS[faction]?.[unit]?.name;
+    return `${name || defaultName}${upgraded[unit] ? " II" : ""}`;
   };
 
   return (
@@ -329,25 +298,6 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           <div style={{ flex: 1 }} />
           <ClearButton onClick={onClear}>Clear</ClearButton>
         </Header>
-        <Header>
-          <HeaderWrapper>
-            {FACTION_ADDITIONAL_COMBAT_UNITS[faction].map(
-              (additionalCombat) => (
-                <HeaderButtonContainer key={additionalCombat}>
-                  <SelectableButton
-                    highlightColor="lightblue"
-                    selected={selectedAdditionalCombatUnit[additionalCombat]}
-                    onClick={() =>
-                      onAdditionalCombatUnitSelected(additionalCombat)
-                    }
-                  >
-                    {additionalCombat}
-                  </SelectableButton>
-                </HeaderButtonContainer>
-              )
-            )}
-          </HeaderWrapper>
-        </Header>
         <ScrollContainer>
           <UnitRow
             limit={combat.Flagship.totalUnits}
@@ -366,6 +316,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               upgraded={upgraded.Flagship}
               onUpgraded={_setUpgraded("Flagship")}
             />
+            <UnitName>{unitName("Flagship", "Flagship")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.War_Sun.totalUnits}
@@ -384,6 +335,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.War_Sun).length > 0)}
               onUpgraded={_setUpgraded("War_Sun")}
             />
+            <UnitName>{unitName("War_Sun", "War Sun")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.Dreadnought.totalUnits}
@@ -404,6 +356,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               }
               onUpgraded={_setUpgraded("Dreadnought")}
             />
+            <UnitName>{unitName("Dreadnought", "Dreadnought")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.Cruiser.totalUnits}
@@ -422,6 +375,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Cruiser).length > 0)}
               onUpgraded={_setUpgraded("Cruiser")}
             />
+            <UnitName>{unitName("Cruiser", "Cruiser")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.Destroyer.totalUnits}
@@ -440,6 +394,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Destroyer).length > 0)}
               onUpgraded={_setUpgraded("Destroyer")}
             />
+            <UnitName>{unitName("Destroyer", "Destroyer")}</UnitName>
           </UnitRow>
           <UnitRow
             rolls={calculateRolls("spaceCombat", combat.Carrier)}
@@ -458,6 +413,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Carrier).length > 0)}
               onUpgraded={_setUpgraded("Carrier")}
             />
+            <UnitName>{unitName("Carrier", "Carrier")}</UnitName>
           </UnitRow>
           <UnitRow
             rolls={calculateRolls("spaceCombat", combat.Fighter)}
@@ -475,6 +431,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Fighter).length > 0)}
               onUpgraded={_setUpgraded("Fighter")}
             />
+            <UnitName>{unitName("Fighter", "Fighter")}</UnitName>
           </UnitRow>
           <UnitRow
             rolls={calculateRolls("spaceCannon", combat.PDS)}
@@ -493,6 +450,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.PDS).length > 0)}
               onUpgraded={_setUpgraded("PDS")}
             />
+            <UnitName>{unitName("PDS", "PDS")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.Mech.totalUnits}
@@ -511,6 +469,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Mech).length > 0)}
               onUpgraded={_setUpgraded("Mech")}
             />
+            <UnitName>{unitName("Mech", "Mech")}</UnitName>
           </UnitRow>
           <UnitRow
             rolls={calculateRolls("groundCombat", combat.Infantry)}
@@ -528,6 +487,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Infantry).length > 0)}
               onUpgraded={_setUpgraded("Infantry")}
             />
+            <UnitName>{unitName("Infantry", "Infantry")}</UnitName>
           </UnitRow>
           <UnitRow
             limit={combat.Space_Dock.totalUnits}
@@ -546,6 +506,54 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               hideUpgrade={!(Object.keys(factionUpgrade.Space_Dock).length > 0)}
               onUpgraded={_setUpgraded("Space_Dock")}
             />
+            <UnitName>{unitName("Space_Dock", "Space Dock")}</UnitName>
+          </UnitRow>
+          <Divider />
+          <UnitRow
+            limit={combat.Memoria.totalUnits}
+            rolls={calculateRolls("spaceCombat", combat.Memoria)}
+            bespokeCombat={bespokeCombat?.Memoria}
+            onBespokeCombatApplied={onBespokeCombatChanged("Memoria")}
+            combat={calculateCombat("spaceCombat", combat.Memoria)}
+            numUnits={numUnits.Memoria}
+            setNumUnits={_setNumUnits("Memoria")}
+          >
+            <UnitIcon
+              unit="Flagship"
+              width={30}
+              faction="Neutral"
+              upgraded={upgraded.Memoria}
+              hideUpgrade={!(Object.keys(factionUpgrade.Memoria).length > 0)}
+              onUpgraded={_setUpgraded("Memoria")}
+            />
+            <UnitName>{upgraded.Memoria ? "Memoria II" : "Memoria"}</UnitName>
+          </UnitRow>
+          <UnitRow
+            limit={combat["Experimental Battlestation"].totalUnits}
+            rolls={calculateRolls(
+              "spaceCannon",
+              combat["Experimental Battlestation"]
+            )}
+            bespokeCombat={bespokeCombat?.["Experimental Battlestation"]}
+            onBespokeCombatApplied={onBespokeCombatChanged(
+              "Experimental Battlestation"
+            )}
+            combat={calculateCombat(
+              "spaceCannon",
+              combat["Experimental Battlestation"]
+            )}
+            numUnits={numUnits["Experimental Battlestation"]}
+            setNumUnits={_setNumUnits("Experimental Battlestation")}
+          >
+            <UnitIcon
+              unit="Space_Dock"
+              width={30}
+              faction="Neutral"
+              upgraded={upgraded["Experimental Battlestation"]}
+              hideUpgrade
+              onUpgraded={_setUpgraded("Experimental Battlestation")}
+            />
+            <UnitName>Experimental Battlestation</UnitName>
           </UnitRow>
         </ScrollContainer>
         <ButtonContainer>

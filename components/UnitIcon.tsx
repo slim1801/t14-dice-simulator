@@ -5,7 +5,7 @@ import { StylelessButton } from "./StylelessButton";
 import IconImage from "./IconImage";
 
 interface UnitIconProps {
-  faction: Factions;
+  faction: Factions | "Neutral";
   unit: Units;
   upgraded?: boolean;
   hideUpgrade?: boolean;

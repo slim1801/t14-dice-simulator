@@ -5,19 +5,6 @@ import {
 } from "../types";
 import { ALL_FACTIONS } from "./factions";
 
-export const FACTION_ADDITIONAL_COMBAT_UNITS: FactionAdditionalCombatUnits =
-  ALL_FACTIONS.reduce((acc, faction) => {
-    acc[faction] = [
-      "Experimental Battlestation",
-      "The Cavalry (Memoria)",
-      "The Cavalry (Memoria II)",
-    ];
-    if (faction === "Titans") {
-      acc[faction].push("Ul The Progenitor");
-    }
-    return acc;
-  }, {} as FactionAdditionalCombatUnits);
-
 export const ADDITIONAL_UNIT_COMBAT: Record<
   AdditionalCombatUnit,
   Partial<UnitCombat>
