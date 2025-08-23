@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styled, { css } from "styled-components";
 import { Factions, Units } from "../types";
 import { StylelessButton } from "./StylelessButton";
@@ -26,7 +25,7 @@ interface IconWrapperProps {
 }
 
 const IconWrapper = styled.div<IconWrapperProps>`
-  margin-left: 40px;
+  margin-left: 35px;
   width: ${(props) => props.width}px;
   height: 100%;
   position: relative;
@@ -44,7 +43,7 @@ const UpgradeButton = styled(StylelessButton)<UpgradeButtonProps>`
   font-weight: 500;
   color: grey;
   border: 1px solid white;
-  font-size: 11px;
+  font-size: 9px;
   position: absolute;
   top: 50%;
   transform: translate(0, -50%);

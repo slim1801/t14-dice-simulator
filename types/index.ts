@@ -13,7 +13,8 @@ export type Units =
   | "Mech"
   | "Infantry"
   | "Memoria"
-  | "Experimental Battlestation";
+  | "Experimental Battlestation"
+  | "Ul The Progenitor";
 
 export type BasePokFactions =
   | "Arborec"
@@ -55,6 +56,7 @@ export interface CombatDetails {
   additional?: boolean;
   rerollMisses?: boolean;
   numUnitsMod?: number[];
+  doubleHits?: boolean;
 
   name?: string;
   additionalHitsFunc?: AdditionalCombatFunc;
@@ -85,6 +87,7 @@ export interface UnitHit {
   name?: string;
   combatStrength: number;
   additionalHits?: number;
+  isDoubled?: boolean;
 }
 
 export interface UnitRoll {
@@ -125,6 +128,7 @@ export type FactionUnitDetails = Record<
 export type CombatTechnology =
   | "Antimass Deflectors"
   | "Plasma Scoring"
+  | "X-89 Bacterial Weapon"
   | "Supercharge";
 export type CombatActionCards =
   | "Bunker"

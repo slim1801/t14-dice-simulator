@@ -19,6 +19,7 @@ export const UNIT_LIST: Units[] = [
   "Infantry",
   "Memoria",
   "Experimental Battlestation",
+  "Ul The Progenitor",
 ];
 
 export const UNIT_ABILITIES: CombatType[] = [
@@ -44,6 +45,7 @@ export const EMPTY_COMBAT_STRENGTH: UnitCombat = {
   Infantry: {},
   Memoria: {},
   "Experimental Battlestation": {},
+  "Ul The Progenitor": {},
 };
 
 export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
@@ -149,6 +151,18 @@ export const DEFAULT_UNIT_COMBAT_STRENGTH: UnitCombat = {
       rolls: 3,
     },
   },
+  "Ul The Progenitor": {
+    name: "Ul The Progenitor",
+    totalUnits: 1,
+    spaceCannon: {
+      combat: 5,
+      rolls: 3,
+    },
+    groundSpaceCannon: {
+      combat: 5,
+      rolls: 3,
+    },
+  },
 };
 
 export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
@@ -223,4 +237,5 @@ export const DEFAULT_UNIT_UPGRADE_COMBAT: UnitCombat = {
     },
   },
   "Experimental Battlestation": {},
+  "Ul The Progenitor": {},
 };

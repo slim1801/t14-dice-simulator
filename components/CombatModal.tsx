@@ -241,6 +241,7 @@ const UnitOrder: Units[] = [
   "Infantry",
   "Memoria",
   "Experimental Battlestation",
+  "Ul The Progenitor",
 ];
 
 const _doroll = (num: number): number[] => {
@@ -666,6 +667,7 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
                 rollValue,
                 reroll
               ),
+              isDoubled: unitCombat?.doubleHits,
             };
           });
         });
@@ -685,12 +687,13 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
     rollHits.forEach((rollHit) => {
       const units = Object.keys(rollHit) as Units[];
       const totalHits = units.reduce((acc, unit) => {
-        acc[unit] = rollHit[unit]
-          .flat()
-          .reduce(
-            (acc, val) => acc + (val.hit ? 1 : 0) + (val.additionalHits || 0),
-            0
-          );
+        acc[unit] = rollHit[unit].flat().reduce((acc, val) => {
+          const accumHits = (val.hit ? 1 : 0) + (val.additionalHits || 0);
+          if (val.isDoubled) {
+            return acc + accumHits * 2;
+          }
+          return acc + accumHits;
+        }, 0);
 
         return acc;
       }, {} as Record<Units, number>);
@@ -956,7 +959,9 @@ const CombatModal: React.FunctionComponent<CombatModalProps> = ({
           {activeUnits.map((activeUnit, index) => {
             return activeUnit.map((unit) => {
               const resolvedFaction =
-                unit === "Experimental Battlestation" || unit === "Memoria"
+                unit === "Experimental Battlestation" ||
+                unit === "Memoria" ||
+                unit === "Ul The Progenitor"
                   ? "Neutral"
                   : faction;
 

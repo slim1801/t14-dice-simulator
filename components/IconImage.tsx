@@ -24,7 +24,7 @@ const IconImage: React.FunctionComponent<IconImageProps> = ({
   if (unit === "Memoria") {
     resolvedUnit = "Flagship";
   }
-  if (unit === "Experimental Battlestation") {
+  if (unit === "Experimental Battlestation" || unit === "Ul The Progenitor") {
     resolvedUnit = "Space_Dock";
   }
   return (

@@ -30,7 +30,6 @@ import {
   BespokeUnitCombat,
 } from "../types";
 import { FactionBackgroundImage } from "./FactionBackgroundImage";
-import { ADDITIONAL_UNIT_COMBAT } from "../constants/additionalCombat";
 import { calculateCombat, calculateRolls } from "../utils/combat";
 
 interface FactionProps {
@@ -84,7 +83,7 @@ const FactionHeading = styled.h1`
 
 const UnitName = styled.p`
   margin-left: 15px;
-  font-size: 0.7em;
+  font-size: 0.6em;
 `;
 
 const Header = styled.div`
@@ -124,6 +123,7 @@ const DEFAULT_NUM_UNITS = {
   Infantry: 0,
   Memoria: 0,
   "Experimental Battlestation": 0,
+  "Ul The Progenitor": 0,
 };
 
 const DEFAULT_UNIT_UPGRADES = {
@@ -140,6 +140,7 @@ const DEFAULT_UNIT_UPGRADES = {
   Infantry: false,
   Memoria: false,
   "Experimental Battlestation": false,
+  "Ul The Progenitor": false,
 };
 
 const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
@@ -312,7 +313,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
               unit="Flagship"
               faction={faction}
               hideUpgrade={!(Object.keys(factionUpgrade.Flagship).length > 0)}
-              width={60}
+              width={50}
               upgraded={upgraded.Flagship}
               onUpgraded={_setUpgraded("Flagship")}
             />
@@ -329,7 +330,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="War_Sun"
-              width={50}
+              width={45}
               faction={faction}
               upgraded={upgraded.War_Sun}
               hideUpgrade={!(Object.keys(factionUpgrade.War_Sun).length > 0)}
@@ -348,7 +349,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Dreadnought"
-              width={65}
+              width={50}
               faction={faction}
               upgraded={upgraded.Dreadnought}
               hideUpgrade={
@@ -369,7 +370,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Cruiser"
-              width={60}
+              width={50}
               faction={faction}
               upgraded={upgraded.Cruiser}
               hideUpgrade={!(Object.keys(factionUpgrade.Cruiser).length > 0)}
@@ -388,7 +389,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Destroyer"
-              width={40}
+              width={35}
               faction={faction}
               upgraded={upgraded.Destroyer}
               hideUpgrade={!(Object.keys(factionUpgrade.Destroyer).length > 0)}
@@ -407,7 +408,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Carrier"
-              width={50}
+              width={45}
               faction={faction}
               upgraded={upgraded.Carrier}
               hideUpgrade={!(Object.keys(factionUpgrade.Carrier).length > 0)}
@@ -500,7 +501,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Space_Dock"
-              width={30}
+              width={35}
               faction={faction}
               upgraded={upgraded.Space_Dock}
               hideUpgrade={!(Object.keys(factionUpgrade.Space_Dock).length > 0)}
@@ -520,7 +521,7 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Flagship"
-              width={30}
+              width={50}
               faction="Neutral"
               upgraded={upgraded.Memoria}
               hideUpgrade={!(Object.keys(factionUpgrade.Memoria).length > 0)}
@@ -547,13 +548,32 @@ const Faction: React.FunctionComponent<FactionProps> = ({ faction }) => {
           >
             <UnitIcon
               unit="Space_Dock"
-              width={30}
+              width={35}
               faction="Neutral"
               upgraded={upgraded["Experimental Battlestation"]}
               hideUpgrade
               onUpgraded={_setUpgraded("Experimental Battlestation")}
             />
             <UnitName>Experimental Battlestation</UnitName>
+          </UnitRow>
+          <UnitRow
+            limit={combat["Ul The Progenitor"].totalUnits}
+            rolls={calculateRolls("spaceCannon", combat["Ul The Progenitor"])}
+            bespokeCombat={bespokeCombat?.["Ul The Progenitor"]}
+            onBespokeCombatApplied={onBespokeCombatChanged("Ul The Progenitor")}
+            combat={calculateCombat("spaceCannon", combat["Ul The Progenitor"])}
+            numUnits={numUnits["Ul The Progenitor"]}
+            setNumUnits={_setNumUnits("Ul The Progenitor")}
+          >
+            <UnitIcon
+              unit="PDS"
+              width={35}
+              faction="Neutral"
+              upgraded={upgraded["Ul The Progenitor"]}
+              hideUpgrade
+              onUpgraded={_setUpgraded("Ul The Progenitor")}
+            />
+            <UnitName>Ul The Progenitor</UnitName>
           </UnitRow>
         </ScrollContainer>
         <ButtonContainer>

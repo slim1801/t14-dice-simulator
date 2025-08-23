@@ -6,11 +6,8 @@ import {
   DSFactionExclusiveUnitCombatTechnology,
   FactionExclusiveUnitCombatTechnology,
   Factions,
-  FactionUnitDetails,
   NumUnits,
   UnitCombat,
-  UnitCombatAbilities,
-  Units,
 } from "../types";
 import { combatModFunc } from "../utils/combat";
 import { ALL_DISCORDANT_FACTIONS } from "./discordantStars/factions";
